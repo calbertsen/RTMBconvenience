@@ -26,6 +26,7 @@ log_ipnorm.advector <- function(x, y, mu, sigma){
 
 ##' @export
 pt2 <- function(x, df, lower_tail = TRUE, log_p = FALSE) UseMethod("pt2")
+##' @export
 pt2.default <- function(x, df, lower_tail = TRUE, log_p = FALSE){
     Value(pt_ad(RTMB::advector(x), RTMB::advector(df), lower_tail, log_p))
 }

@@ -347,10 +347,11 @@ Rcpp::ComplexVector logspace_add_ad(Rcpp::ComplexVector x, Rcpp::ComplexVector y
 Rcpp::ComplexVector logspace_sum_ad(Rcpp::ComplexVector x) {
   CHECK_INPUT(x);
   int n = x.size();
-  Rcpp::ComplexVector ans(1);
+  Rcpp::ComplexVector ans(1);  
   const ad* X1 = adptr(x);
   ad* Y = adptr(ans);
-  for (int i=0; i<n; i++) Y[0] = logspace_add2(X1[i], Y[0]);
+  Y[0] = X1[0];
+  for (int i=1; i<n; i++) Y[0] = logspace_add2(X1[i], Y[0]);
   return as_advector(ans);
 }
 
