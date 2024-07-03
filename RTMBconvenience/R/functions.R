@@ -83,3 +83,8 @@ toRowLogPropMatrix <- function(x){
     ys <- simplify(safe_apply(y,1,logspace_sum))
     y - ys[row(y)]
 }
+
+##' @export
+logspace_1m <- function(logx){
+    log1p(-exp(logx))
+}

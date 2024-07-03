@@ -71,8 +71,8 @@ namespace adaptive {
       return R_NegInf;
     if(logy == R_NegInf)
       return(logx);
-    if(logx < logy)
-      Rf_error("logx < logy in logspace_sub2");
+    if(fabs(logx) < 1e-16)
+      return log1p(-exp(logy));
     return logx + atomic::robust_utils::R_Log1_Exp(logy - logx);
   }
 
@@ -243,7 +243,7 @@ Type log_ipnorm_(Type x, Type y, Type mu, Type sigma){
 
 // [[Rcpp::export]]
 Rcpp::ComplexVector log_ipnorm_ad(Rcpp::ComplexVector x, Rcpp::ComplexVector y, Rcpp::ComplexVector mu, Rcpp::ComplexVector sigma) {
-  CHECK_INPUT(x); CHECK_INPUT(y); CHECK_INPUT(mu); CHECK_INPUT(sigma);
+  CHECK_INPUT(x); CHECK_INPUT(y); CHECK_INPUT(sigma); 
   size_t n1 = x.size();
   size_t n2 = y.size();
   size_t n3 = mu.size();
@@ -275,7 +275,7 @@ TMB_BIND_ATOMIC(pt_at,1100,adaptive::pt_raw(x[0], x[1], x[2], x[3]))
 
 // [[Rcpp::export]]
 Rcpp::ComplexVector pt_ad(Rcpp::ComplexVector x, Rcpp::ComplexVector df, bool lower_tail, bool log_p ) {
-  CHECK_INPUT(x); CHECK_INPUT(df);
+  CHECK_INPUT(x); CHECK_INPUT(df); 
   size_t n1 = x.size();
   size_t n2 = df.size();
   int nmax = std::max({n1, n2});
@@ -299,7 +299,7 @@ Type ps_(Type x) {
 
 // [[Rcpp::export]]
 Rcpp::ComplexVector pde_scheme_ad(Rcpp::ComplexVector x) {
-  CHECK_INPUT(x);
+  CHECK_INPUT(x); 
   int n = x.size();
   Rcpp::ComplexVector ans(n);
   const ad* X1 = adptr(x);
@@ -315,12 +315,6 @@ TMB_BIND_ATOMIC(logspace_add2x,
 
 template<class Type>
 Type logspace_add2(Type logx, Type logy) {
-  if ( !CppAD::Variable(logx) && logx == Type(R_NegInf) && !CppAD::Variable(logy) && logy == Type(R_NegInf))
-    return Type(R_NegInf);
-  if ( !CppAD::Variable(logx) && logx == Type(R_NegInf) )
-    return logy;
-  if ( !CppAD::Variable(logy) && logy == Type(R_NegInf) )
-    return logx;
   vector<Type> tx(3);
   tx[0] = logx;
   tx[1] = logy;
@@ -330,7 +324,7 @@ Type logspace_add2(Type logx, Type logy) {
 
 // [[Rcpp::export]]
 Rcpp::ComplexVector logspace_add_ad(Rcpp::ComplexVector x, Rcpp::ComplexVector y) {
-  CHECK_INPUT(x); CHECK_INPUT(y);
+  CHECK_INPUT(x); CHECK_INPUT(y); 
   size_t n1 = x.size();
   size_t n2 = y.size();
   int nmax = std::max({n1, n2});
@@ -345,7 +339,7 @@ Rcpp::ComplexVector logspace_add_ad(Rcpp::ComplexVector x, Rcpp::ComplexVector y
 
 // [[Rcpp::export]]
 Rcpp::ComplexVector logspace_sum_ad(Rcpp::ComplexVector x) {
-  CHECK_INPUT(x);
+  CHECK_INPUT(x); 
   int n = x.size();
   Rcpp::ComplexVector ans(1);  
   const ad* X1 = adptr(x);
@@ -362,8 +356,6 @@ TMB_BIND_ATOMIC(logspace_sub2x,
 		adaptive::logspace_sub2_raw(x[0], x[1]) )  
 template<class Type>
 Type logspace_sub2(Type logx, Type logy) {
-  if ( !CppAD::Variable(logy) && logy == Type(R_NegInf) )
-    return logx;
   vector<Type> tx(3);
   tx[0] = logx;
   tx[1] = logy;
@@ -372,7 +364,7 @@ Type logspace_sub2(Type logx, Type logy) {
 }
 // [[Rcpp::export]]
 Rcpp::ComplexVector logspace_sub_ad(Rcpp::ComplexVector x, Rcpp::ComplexVector y) {
-  CHECK_INPUT(x); CHECK_INPUT(y);
+  CHECK_INPUT(x); CHECK_INPUT(y); 
   size_t n1 = x.size();
   size_t n2 = y.size();
   int nmax = std::max({n1, n2});
@@ -397,7 +389,7 @@ Rcpp::ComplexVector logspace_sub_ad(Rcpp::ComplexVector x, Rcpp::ComplexVector y
   }
 // [[Rcpp::export]]
 Rcpp::ComplexVector quantreg_ad(Rcpp::ComplexVector x, Rcpp::ComplexVector tau) {
-  CHECK_INPUT(x); CHECK_INPUT(tau);
+  CHECK_INPUT(x); CHECK_INPUT(tau); 
   size_t n1 = x.size();
   size_t n2 = tau.size();
   int nmax = std::max({n1, n2});
@@ -424,7 +416,7 @@ Type login_log_besselI_(Type logx, Type nu) {
 }
 // [[Rcpp::export]]
 Rcpp::ComplexVector login_log_besselI_ad(Rcpp::ComplexVector logx, Rcpp::ComplexVector nu) {
-  CHECK_INPUT(logx); CHECK_INPUT(nu);
+  CHECK_INPUT(logx); CHECK_INPUT(nu); 
   size_t n1 = logx.size();
   size_t n2 = nu.size();
   int nmax = std::max({n1, n2});
@@ -450,7 +442,7 @@ Type log_besselI_(Type x, Type nu) {
 }
 // [[Rcpp::export]]
 Rcpp::ComplexVector log_besselI_ad(Rcpp::ComplexVector x, Rcpp::ComplexVector nu) {
-  CHECK_INPUT(x); CHECK_INPUT(nu);
+  CHECK_INPUT(x); CHECK_INPUT(nu); 
   size_t n1 = x.size();
   size_t n2 = nu.size();
   int nmax = std::max({n1, n2});
@@ -478,7 +470,7 @@ Type log_MarcumQ_(Type a, Type b, Type nu) {
 }
 // [[Rcpp::export]]
 Rcpp::ComplexVector log_MarcumQ_ad(Rcpp::ComplexVector a, Rcpp::ComplexVector b, Rcpp::ComplexVector nu) {
-  CHECK_INPUT(a); CHECK_INPUT(b); CHECK_INPUT(nu);
+  CHECK_INPUT(a); CHECK_INPUT(b); CHECK_INPUT(nu); 
   size_t n1 = a.size();
   size_t n2 = b.size();
   size_t n3 = nu.size();
@@ -507,7 +499,7 @@ Type login_log_MarcumQ_(Type loga, Type logb, Type nu) {
 }
 // [[Rcpp::export]]
 Rcpp::ComplexVector login_log_MarcumQ_ad(Rcpp::ComplexVector loga, Rcpp::ComplexVector logb, Rcpp::ComplexVector nu) {
-  CHECK_INPUT(loga); CHECK_INPUT(logb); CHECK_INPUT(nu);
+  CHECK_INPUT(loga); CHECK_INPUT(logb); CHECK_INPUT(nu); 
   size_t n1 = loga.size();
   size_t n2 = logb.size();
   size_t n3 = nu.size();
@@ -535,7 +527,7 @@ Type log_Marcum1mQ_(Type a, Type b, Type nu) {
 }
 // [[Rcpp::export]]
 Rcpp::ComplexVector log_Marcum1mQ_ad(Rcpp::ComplexVector a, Rcpp::ComplexVector b, Rcpp::ComplexVector nu) {
-  CHECK_INPUT(a); CHECK_INPUT(b); CHECK_INPUT(nu);
+  CHECK_INPUT(a); CHECK_INPUT(b); CHECK_INPUT(nu); 
   size_t n1 = a.size();
   size_t n2 = b.size();
   size_t n3 = nu.size();
@@ -564,7 +556,7 @@ Type login_log_Marcum1mQ_(Type loga, Type logb, Type nu) {
 }
 // [[Rcpp::export]]
 Rcpp::ComplexVector login_log_Marcum1mQ_ad(Rcpp::ComplexVector loga, Rcpp::ComplexVector logb, Rcpp::ComplexVector nu) {
-  CHECK_INPUT(loga); CHECK_INPUT(logb); CHECK_INPUT(nu);
+  CHECK_INPUT(loga); CHECK_INPUT(logb); CHECK_INPUT(nu); 
   size_t n1 = loga.size();
   size_t n2 = logb.size();
   size_t n3 = nu.size();
@@ -593,7 +585,7 @@ Type logdrice_(Type logx, Type lognu, Type logsigma) {
 }
 // [[Rcpp::export]]
 Rcpp::ComplexVector logdrice_ad(Rcpp::ComplexVector logx, Rcpp::ComplexVector lognu, Rcpp::ComplexVector logsigma) {
-  CHECK_INPUT(logx); CHECK_INPUT(lognu); CHECK_INPUT(logsigma);
+  CHECK_INPUT(logx); CHECK_INPUT(lognu); CHECK_INPUT(logsigma); 
   size_t n1 = logx.size();
   size_t n2 = lognu.size();
   size_t n3 = logsigma.size();
@@ -622,7 +614,7 @@ Type logprice_(Type logx, Type lognu, Type logsigma, int lower_tail) {
 }
 // [[Rcpp::export]]
 Rcpp::ComplexVector logprice_ad(Rcpp::ComplexVector logx, Rcpp::ComplexVector lognu, Rcpp::ComplexVector logsigma, bool lower_tail) {
-  CHECK_INPUT(logx); CHECK_INPUT(lognu); CHECK_INPUT(logsigma);
+  CHECK_INPUT(logx); CHECK_INPUT(lognu); CHECK_INPUT(logsigma); 
   size_t n1 = logx.size();
   size_t n2 = lognu.size();
   size_t n3 = logsigma.size();
