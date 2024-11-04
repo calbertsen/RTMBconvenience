@@ -18,21 +18,45 @@ setGeneric("pnorm5", function(x,mu,sigma,lower_tail=TRUE,log_p=FALSE){
           })
 ##' @export
 setMethod("pnorm5",
-          signature(x = "num", mu = "num", sigma="num",lower_tail="logical",log_p="logical"),
+          signature(x = "num", mu = "num", sigma="num",lower_tail="ANY",log_p="ANY"),
           function(x,mu,sigma,lower_tail=TRUE,log_p=FALSE){
               Value(pnorm5_ad(advector(x),advector(mu),advector(sigma), lower_tail, log_p))
           })
 ##' @export
 setMethod("pnorm5",
-          signature(x = "ad", mu="ad", sigma="ad",lower_tail="logical",log_p="logical"),
+          signature(x = "ad", mu="ad", sigma="ad",lower_tail="ANY",log_p="ANY"),
           function(x,mu,sigma,lower_tail=TRUE,log_p=FALSE){
               pnorm5_ad(advector(x),advector(mu),advector(sigma), lower_tail, log_p)
           })
 ##' @export
 setMethod("pnorm5",
-          signature(x = "advector",mu="advector",sigma="advector",lower_tail="logical",log_p="logical"),
+          signature(x = "advector",mu="advector",sigma="advector",lower_tail="ANY",log_p="ANY"),
           function(x,mu,sigma,lower_tail=TRUE,log_p=FALSE){
               pnorm5_ad(x,mu,sigma, lower_tail, log_p)
+          })
+
+
+##' @export
+setGeneric("qnorm5", function(x,mu,sigma,lower_tail=TRUE,log_p=FALSE){
+              (qnorm5_ad(advector(x),advector(mu),advector(sigma), lower_tail, log_p))
+          })
+##' @export
+setMethod("qnorm5",
+          signature(x = "num", mu = "num", sigma="num",lower_tail="ANY",log_p="ANY"),
+          function(x,mu,sigma,lower_tail=TRUE,log_p=FALSE){
+              Value(qnorm5_ad(advector(x),advector(mu),advector(sigma), lower_tail, log_p))
+          })
+##' @export
+setMethod("qnorm5",
+          signature(x = "ad", mu="ad", sigma="ad",lower_tail="ANY",log_p="ANY"),
+          function(x,mu,sigma,lower_tail=TRUE,log_p=FALSE){
+              qnorm5_ad(advector(x),advector(mu),advector(sigma), lower_tail, log_p)
+          })
+##' @export
+setMethod("qnorm5",
+          signature(x = "advector",mu="advector",sigma="advector",lower_tail="ANY",log_p="ANY"),
+          function(x,mu,sigma,lower_tail=TRUE,log_p=FALSE){
+              qnorm5_ad(x,mu,sigma, lower_tail, log_p)
           })
 
 
@@ -90,22 +114,47 @@ setGeneric("pt2", function(x,df,lower_tail=TRUE,log_p=FALSE){
           })
 ##' @export
 setMethod("pt2",
-          signature(x = "num", df = "num", lower_tail="logical",log_p="logical"),
+          signature(x = "num", df = "num", lower_tail="ANY",log_p="ANY"),
           function(x,df,lower_tail=TRUE,log_p=FALSE){
               Value(pt_ad(advector(x),advector(df), lower_tail, log_p))
           })
 ##' @export
 setMethod("pt2",
-          signature(x = "ad", df = "ad", lower_tail="logical",log_p="logical"),
+          signature(x = "ad", df = "ad", lower_tail="ANY",log_p="ANY"),
           function(x,df,lower_tail=TRUE,log_p=FALSE){
               pt_ad(advector(x),advector(df), lower_tail, log_p)
           })
 ##' @export
 setMethod("pt2",
-          signature(x = "advector",df = "advector", lower_tail="logical",log_p="logical"),
+          signature(x = "advector",df = "advector", lower_tail="ANY",log_p="ANY"),
           function(x,df,lower_tail=TRUE,log_p=FALSE){
               pt_ad(x,df, lower_tail, log_p)
           })
+
+
+##' @export
+setGeneric("qt2", function(p,df,lower_tail=TRUE,log_p=FALSE){
+              (qt_ad(advector(p),advector(df), lower_tail, log_p))
+          })
+##' @export
+setMethod("qt2",
+          signature(p = "num", df = "num", lower_tail="ANY",log_p="ANY"),
+          function(p,df,lower_tail=TRUE,log_p=FALSE){
+              Value(qt_ad(advector(p),advector(df), lower_tail, log_p))
+          })
+##' @export
+setMethod("qt2",
+          signature(p = "ad", df = "ad", lower_tail="ANY",log_p="ANY"),
+          function(p,df,lower_tail=TRUE,log_p=FALSE){
+              qt_ad(advector(p),advector(df), lower_tail, log_p)
+          })
+##' @export
+setMethod("qt2",
+          signature(p = "advector",df = "advector", lower_tail="ANY",log_p="ANY"),
+          function(p,df,lower_tail=TRUE,log_p=FALSE){
+              qt_ad(p,df, lower_tail, log_p)
+          })
+
 
 
 ## ##' @export 
@@ -204,16 +253,28 @@ setMethod("logspace_sub",
 
 
 
-## ##' @export
-## quantreg <- function(x, tau) UseMethod("quantreg")
-## ##' @export
-## quantreg.default <- function(x, tau){
-##     Value(quantreg_ad(RTMB::advector(x),RTMB::advector(tau)))
-## }
-## ##' @export
-## quantreg.advector <- function(x, tau){
-##     quantreg_ad(x,tau)
-## }
+##' @export
+setGeneric("quantreg_loss", function(x,tau){
+              (quantreg_ad(advector(x),advector(tau)))
+          })
+##' @export
+setMethod("quantreg_loss",
+          signature(x = "num", tau = "num"),
+          function(x, tau){
+              Value(quantreg_ad(advector(x),advector(tau)))
+          })
+##' @export
+setMethod("quantreg_loss",
+          signature(x = "ad", tau = "ad"),
+          function(x,tau){
+              quantreg_ad(advector(x),advector(tau))
+          })
+##' @export
+setMethod("quantreg_loss",
+          signature(x = "advector",tau = "advector"),
+          function(x,tau){
+              quantreg_ad(x,tau)
+          })
 
 
 
@@ -469,20 +530,78 @@ setGeneric("logprice", function(logx,lognu,logsigma, lower_tail = TRUE){
           })
 ##' @export
 setMethod("logprice",
-          signature(logx = "num",lognu="num", logsigma = "num", lower_tail = "logical"),
+          signature(logx = "num",lognu="num", logsigma = "num", lower_tail = "ANY"),
           function(logx,lognu, logsigma, lower_tail = TRUE){
               Value(logprice_ad(advector(logx),advector(lognu),advector(logsigma), lower_tail))
           })
 ##' @export
 setMethod("logprice",
-          signature(logx = "ad", lognu="ad", logsigma = "ad", lower_tail = "logical"),
+          signature(logx = "ad", lognu="ad", logsigma = "ad", lower_tail = "ANY"),
           function(logx,lognu,logsigma, lower_tail = TRUE){
               logprice_ad(advector(logx),advector(lognu),advector(logsigma), lower_tail)
           })
 ##' @export
 setMethod("logprice",
-          signature(logx = "advector", lognu = "advector", logsigma = "advector", lower_tail = "logical"),
+          signature(logx = "advector", lognu = "advector", logsigma = "advector", lower_tail = "ANY"),
           function(logx,lognu,logsigma, lower_tail = TRUE){
               logprice_ad(logx,lognu,logsigma, lower_tail)
           })
 
+
+
+setGeneric("pnchisq", function(x,df,ncp, lower_tail = TRUE, log_p=FALSE){
+              (pnchisq_ad(advector(x),advector(df),advector(ncp), lower_tail, log_p))
+          })
+##' @export
+setMethod("pnchisq",
+          signature(x = "num",df="num", ncp = "num", lower_tail = "ANY", log_p="ANY"),
+          function(x,df,ncp, lower_tail = TRUE, log_p=FALSE){
+              Value(pnchisq_ad(advector(x),advector(df),advector(ncp), lower_tail, log_p))
+          })
+##' @export
+setMethod("pnchisq",
+          signature(x = "ad",df="ad", ncp = "ad", lower_tail = "ANY", log_p="ANY"),
+          function(x,df,ncp, lower_tail = TRUE, log_p=FALSE){
+              pnchisq_ad(advector(x),advector(df),advector(ncp), lower_tail, log_p)
+          })
+##' @export
+setMethod("pnchisq",
+          signature(x = "advector",df="advector", ncp = "advector", lower_tail = "ANY", log_p="ANY"),
+          function(x,df,ncp, lower_tail = TRUE, log_p=FALSE){
+              pnchisq_ad(advector(x),advector(df),advector(ncp), lower_tail, log_p)
+          })
+
+
+
+
+
+setGeneric("pde_scheme", function(x){
+              pde_scheme_ad(advector(x))
+          })
+##' @export
+setMethod("pde_scheme",
+          signature(x = "num"),
+          function(x){
+              Value(pde_scheme_ad(advector(x)))
+          })
+##' @export
+setMethod("pde_scheme",
+          signature(x = "ad"),
+          function(x){
+              pde_scheme_ad(advector(x))
+          })
+##' @export
+setMethod("pde_scheme",
+          signature(x = "advector"),
+          function(x){
+              pde_scheme_ad(x)
+          })
+
+##' @export
+sparse_solve <- function(x,b){
+    if(is(x,"adsparse")){
+        return(sparse_solve_ad(x,advector(b)))
+    }else{
+        return(sparse_solve_NotAD(as(x,"sparseMatrix"),b))
+    }
+}

@@ -33,6 +33,22 @@ namespace adaptive {
   };
 
   template<class Float>
+  Float qt_raw(Float p, Float n, Float lower_tail, Float log_p){
+    return fromR::qt(p,n,(int)trunc(lower_tail),(int)trunc(log_p));    
+  };
+
+  template<class Float>
+  Float qnorm1_raw(Float x, Float lower_tail, Float log_p){
+    return fromR::qnorm5(x,(Float)0.0,(Float)1.0,(int)trunc(lower_tail),(int)trunc(log_p));    
+  };
+
+   template<class Float>
+   Float pnchisq_raw(Float x, Float df, Float ncp, Float lower_tail, Float log_p){
+    return fromR::pnchisq(x,df,ncp,(int)trunc(lower_tail),(int)trunc(log_p));    
+  };
+
+  
+  template<class Float>
   Float ps_raw (Float Pf) {
     Float af = 0.0;
     if(Pf > 10.0){
@@ -117,68 +133,36 @@ namespace adaptive {
 
   template<class Float>
   Float log_MarcumQ_raw(Float a, Float b, Float nu){
-    if(fabs(b) < 1e-16 || a == R_PosInf || nu == R_PosInf) return 0.0;
-    if(b == R_NegInf) return 0.0;
+    Float x = b*b;
+    Float df = 2.0 * nu;
+    Float ncp = a*a;
+    return fromR::pnchisq(x, df, ncp, (int)0, (int)1);
 
-    Float r = R_NegInf;
-    Float dr = R_PosInf;
-    Float k = 1 - nu;
-    Float ab = a * b;
-    while(dr > -30){
-      dr = k * (log(a) - log(b)) + log_besselI_raw(ab,(Float)-k);
-      k += 1.0;
-      r = logspace_add2_raw(r,dr);
-    }
-    return -(a*a + b*b) / 2.0 + r;
   }
 
   template<class Float>
   Float login_log_MarcumQ_raw(Float loga, Float logb, Float nu){
-    if(logb == R_NegInf || loga == R_PosInf || nu == R_PosInf) return 0.0;
+    Float x = exp(2.0 * logb);
+    Float df = 2.0 * nu;
+    Float ncp = exp(2.0 * loga);
+    return fromR::pnchisq(x, df, ncp, (int)0, (int)1);
 
-    Float r = R_NegInf;
-    Float dr = R_PosInf;
-    Float k = 1 - nu;
-    Float logab = loga + logb;
-    while(dr > -30){
-      dr = k * (loga - logb) + login_log_besselI_raw(logab,(Float)-k);
-      k += 1.0;
-      r = logspace_add2_raw(r,dr);
-    }
-    return -exp(logspace_add2_raw((Float)(2.0 * loga), (Float)(2.0 * logb))) / 2.0 + r;
   }
 
   template<class Float>
   Float log_Marcum1mQ_raw(Float a, Float b, Float nu){
-    if(fabs(b) < 1e-16 || a == R_PosInf || nu == R_PosInf) return R_NegInf;
-    if(b == R_NegInf) return R_PosInf;
-
-    Float r = R_NegInf;
-    Float dr = R_PosInf;
-    Float alpha = nu;
-    Float ab = a * b;
-    while(dr > -30){
-      dr = (Float)(alpha) * (log(b) - log(a)) + log_besselI_raw(ab,alpha);
-      alpha += 1.0;
-      r = logspace_add2_raw(r,dr);
-    }
-    return -(a*a + b*b) / 2.0 + r;
+    Float x = b*b;
+    Float df = 2.0 * nu;
+    Float ncp = a*a;
+    return fromR::pnchisq(x, df, ncp, (int)1, (int)1);
   }
 
   template<class Float>
   Float login_log_Marcum1mQ_raw(Float loga, Float logb, Float nu){
-    if(logb == R_NegInf || loga == R_PosInf || nu == R_PosInf) return R_NegInf;
-
-    Float r = R_NegInf;
-    Float dr = R_PosInf;
-    Float alpha = nu;
-    Float logab = loga + logb;
-    while(dr > -30){
-      dr = (Float)(alpha) * (logb - loga) + login_log_besselI_raw(logab,alpha);
-      alpha += 1.0;
-      r = logspace_add2_raw(r,dr);
-    }
-    return -exp(logspace_add2_raw((Float)(2.0 * loga), (Float)(2.0 * logb))) / 2.0 + r;
+    Float x = exp(2.0 * logb);
+    Float df = 2.0 * nu;
+    Float ncp = exp(2.0 * loga);
+    return fromR::pnchisq(x, df, ncp, (int)1, (int)1);
   }
 
   template<class Float>
@@ -190,15 +174,52 @@ namespace adaptive {
   Float logprice_raw(Float logx, Float lognu, Float logsigma, Float lower_tail){
     Float v1 = (lognu - logsigma);
     Float v2 = (logx - logsigma);
-    Float ut = login_log_MarcumQ_raw(v1,v2,(Float)1);
-    if((int)trunc(lower_tail))
-      return logspace_sub2_raw((Float)0.0,ut);
+    //Float ut = login_log_MarcumQ_raw(v1,v2,(Float)1);
+    // For nchisq dist, F(x; ncp=nu, df=k) = 1 - Q_{k/2}(sqrt(nu), sqrt(x)), so
+    // Q_1(a,b) = 1 - F(b^2; nu^2, k/2)
+    // pnchisq(x, df, ncp, lower_tail, log_p)
+    Float ut = fromR::pnchisq((Float)(exp(2.0 * v2)), (Float)2.0, (Float)exp(2.0 * v1), (int)trunc(lower_tail), (int)1);
+    // if((int)trunc(lower_tail))
+    //   return logspace_sub2_raw((Float)0.0,ut);
     return ut;
   }
 
 
   
 }
+
+
+TMB_BIND_ATOMIC(pnchisq_2x,11100,adaptive::pnchisq_raw(x[0], x[1], x[2], x[3], x[4]))  
+template<class Type>
+Type pnchisq_(Type x, Type df, Type ncp, int lower_tail, int log_p){
+  vector<Type> tx(6);
+  tx[0] = x;
+  tx[1] = df;
+  tx[2] = ncp;
+  tx[3] = (Type)lower_tail;
+  tx[4] = (Type)log_p;
+  tx[5] = 0; // extra argument for derivative order
+  Type res = pnchisq_2x(CppAD::vector<Type>(tx))[0];
+  return res;
+}
+
+// [[Rcpp::export]]
+Rcpp::ComplexVector pnchisq_ad(Rcpp::ComplexVector x, Rcpp::ComplexVector df, Rcpp::ComplexVector ncp, bool lower_tail, bool log_p ) {
+  CHECK_INPUT(x); CHECK_INPUT(df); CHECK_INPUT(ncp);
+  size_t n1 = x.size();
+  size_t n2 = df.size();
+  size_t n3 = ncp.size();
+  int nmax = std::max({n1, n2, n3});
+  int nmin = std::min({n1, n2, n3});
+  int n = (nmin == 0 ? 0 : nmax);
+  Rcpp::ComplexVector ans(n);
+  const ad* X1 = adptr(x); const ad* X2 = adptr(df); const ad* X3 = adptr(ncp);
+  ad* Y = adptr(ans);
+  for (int i=0; i<n; i++) Y[i] = pnchisq_(X1[i % n1], X2[i % n2], X3[i % n3], lower_tail, log_p);
+  return as_advector(ans);
+}
+
+
 
 TMB_BIND_ATOMIC(pnorm1_2x,100,adaptive::pnorm1_1x(x[0], x[1], x[2]))  
 template<class Type>
@@ -229,6 +250,40 @@ Rcpp::ComplexVector pnorm5_ad(Rcpp::ComplexVector x, Rcpp::ComplexVector mu, Rcp
   for (int i=0; i<n; i++) Y[i] = pnorm5_(X1[i % n1], X2[i % n2], X3[i % n3], lower_tail, log_p);
   return as_advector(ans);
 }
+
+
+TMB_BIND_ATOMIC(qnorm1,100,adaptive::qnorm1_raw(x[0], x[1], x[2]))  
+template<class Type>
+Type qnorm5_(Type x, Type mu, Type sigma, int lower_tail, int log_p){
+  vector<Type> tx(4);
+  tx[0] = x;
+  // tx[1] = mu;
+  // tx[2] = sigma;
+  tx[1] = (Type)lower_tail;
+  tx[2] = (Type)log_p;
+  tx[3] = 0; // extra argument for derivative order
+  Type res = qnorm1(CppAD::vector<Type>(tx))[0] * sigma + mu;
+  return res;
+}
+
+// [[Rcpp::export]]
+Rcpp::ComplexVector qnorm5_ad(Rcpp::ComplexVector x, Rcpp::ComplexVector mu, Rcpp::ComplexVector sigma, bool lower_tail, bool log_p ) {
+  CHECK_INPUT(x); CHECK_INPUT(mu); CHECK_INPUT(sigma);
+  size_t n1 = x.size();
+  size_t n2 = mu.size();
+  size_t n3 = sigma.size();
+  int nmax = std::max({n1, n2, n3});
+  int nmin = std::min({n1, n2, n3});
+  int n = (nmin == 0 ? 0 : nmax);
+  Rcpp::ComplexVector ans(n);
+  const ad* X1 = adptr(x); const ad* X2 = adptr(mu); const ad* X3 = adptr(sigma);
+  ad* Y = adptr(ans);
+  for (int i=0; i<n; i++) Y[i] = qnorm5_(X1[i % n1], X2[i % n2], X3[i % n3], lower_tail, log_p);
+  return as_advector(ans);
+}
+
+
+
 
 TMB_BIND_ATOMIC(log_ipnorm1_2x,11,adaptive::log_ipnorm1_1x(x[0], x[1]))  
 template<class Type>
@@ -287,6 +342,40 @@ Rcpp::ComplexVector pt_ad(Rcpp::ComplexVector x, Rcpp::ComplexVector df, bool lo
   for (int i=0; i<n; i++) Y[i] = pt_(X1[i % n1], X2[i % n2], lower_tail, log_p);
   return as_advector(ans);
 }
+
+
+
+TMB_BIND_ATOMIC(qt_at,1100,adaptive::qt_raw(x[0], x[1], x[2], x[3]))  
+ template<class Type>
+  Type qt_(Type p, Type n, int lower_tail, int log_p){
+    vector<Type> tx(5);
+    tx[0] = p;
+    tx[1] = n;
+    // tx[2] = sigma;
+    tx[2] = (Type)lower_tail;
+    tx[3] = (Type)log_p;
+    tx[4] = 0; // extra argument for derivative order
+    Type res = qt_at(CppAD::vector<Type>(tx))[0];
+    return res;
+  }
+
+// [[Rcpp::export]]
+Rcpp::ComplexVector qt_ad(Rcpp::ComplexVector p, Rcpp::ComplexVector df, bool lower_tail, bool log_p ) {
+  CHECK_INPUT(p); CHECK_INPUT(df); 
+  size_t n1 = p.size();
+  size_t n2 = df.size();
+  int nmax = std::max({n1, n2});
+  int nmin = std::min({n1, n2});
+  int n = (nmin == 0 ? 0 : nmax);
+  Rcpp::ComplexVector ans(n);
+  const ad* X1 = adptr(p); const ad* X2 = adptr(df);
+  ad* Y = adptr(ans);
+  for (int i=0; i<n; i++) Y[i] = qt_(X1[i % n1], X2[i % n2], lower_tail, log_p);
+  return as_advector(ans);
+}
+
+
+
 
 TMB_BIND_ATOMIC(ps0,1,adaptive::ps_raw(x[0]) )
 template<class Type>
@@ -510,6 +599,7 @@ Rcpp::ComplexVector login_log_MarcumQ_ad(Rcpp::ComplexVector loga, Rcpp::Complex
   const ad* X1 = adptr(loga); const ad* X2 = adptr(logb); const ad* X3 = adptr(nu);
   ad* Y = adptr(ans);
   for (int i=0; i<n; i++) Y[i] = login_log_MarcumQ_(X1[i % n1], X2[i % n2], X3[i % n3]);
+  //for (int i=0; i<n; i++) Y[i] = pnchisq_(X2[i % n1], X3[i % n2], X1[i % n3],0,1);
   return as_advector(ans);
 }
 
@@ -538,6 +628,7 @@ Rcpp::ComplexVector log_Marcum1mQ_ad(Rcpp::ComplexVector a, Rcpp::ComplexVector 
   const ad* X1 = adptr(a); const ad* X2 = adptr(b); const ad* X3 = adptr(nu);
   ad* Y = adptr(ans);
   for (int i=0; i<n; i++) Y[i] = log_Marcum1mQ_(X1[i % n1], X2[i % n2], X3[i % n3]);
+  //for (int i=0; i<n; i++) Y[i] = pnchisq_(X2[i % n1], X3[i % n2], X1[i % n3],1,1);
   return as_advector(ans);
 }
 
@@ -567,6 +658,7 @@ Rcpp::ComplexVector login_log_Marcum1mQ_ad(Rcpp::ComplexVector loga, Rcpp::Compl
   const ad* X1 = adptr(loga); const ad* X2 = adptr(logb); const ad* X3 = adptr(nu);
   ad* Y = adptr(ans);
   for (int i=0; i<n; i++) Y[i] = login_log_Marcum1mQ_(X1[i % n1], X2[i % n2], X3[i % n3]);
+  //for (int i=0; i<n; i++) Y[i] = pnchisq_(X2[i % n1], X3[i % n2], X1[i % n3],1,1);
   return as_advector(ans);
 }
 

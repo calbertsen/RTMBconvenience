@@ -10,7 +10,7 @@ Author: Christoffer Moesgaard Albertsen [aut, cre]
 Maintainer: Christoffer Moesgaard Albertsen <cmoe@aqua.dtu.dk>
 Description: A collection of functions that are useful for building models with 'RTMB'.
 License: GPL (>= 2)
-LinkingTo: Rcpp, RcppEigen, RTMB, TMB
+LinkingTo: Rcpp, RcppEigen, RTMB (>=1.6), TMB
 Imports: RTMB
 URL: https://github.com/calbertsen/RTMBconvenience
 Encoding: UTF-8

@@ -1,13 +1,12 @@
 
-RTMB_magic <- utils::getFromNamespace("magic","RTMB")
 
 ##' @export
 simplify <- function(x){
     if(!is.list(x)) return(x)
     if(length(x) == 1) return(x[[1]])
-    r <- RTMB_magic(numeric(length(x)))
+    r <- AD(numeric(length(x)))
     for(i in seq_along(x))
-        r[i] <- RTMB_magic(x[[i]])
+        r[i] <- AD(x[[i]])
     r
 }
 

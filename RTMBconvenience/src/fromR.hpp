@@ -1,4 +1,3 @@
-
   /*
    *  Mathlib : A C Library of Special Functions
    *  Copyright (C) 1998	    Ross Ihaka
@@ -105,13 +104,18 @@
 #define ML_ERR_return_NAN return R_NaN
 #define ML_WARN_return_NAN return R_NaN
 
+#define give_log log_p
+    
 #define R_D__0	(log_p ? ML_NEGINF : 0.)		/* 0 */
 #define R_D__1	(log_p ? 0. : 1.)			/* 1 */
 #define R_DT_0	(lower_tail ? R_D__0 : R_D__1)		/* 0 */
 #define R_DT_1	(lower_tail ? R_D__1 : R_D__0) /* 1 */
 # define attribute_hidden __attribute__ ((visibility ("hidden")))
 
-
+#define R_D_val(x)	(log_p	? log(x) : (x))		/*  x  in pF(x,..) */
+#define R_D_Clog(p)	(log_p	? log1p(-(p)) : (0.5 - (p) + 0.5)) /* [log](1-p) */
+#define R_DT_val(x)	(lower_tail ? R_D_val(x)  : R_D_Clog(x))
+    
   
 #define SIXTEN	16 /* Cutoff allowing exact "*" and "/" */
 
@@ -119,7 +123,67 @@
 
 #define M_SQRT_32	5.656854249492380195206754896838	/* sqrt(32) */
 #define M_1_SQRT_2PI	0.398942280401432677939946059934	/* 1/sqrt(2pi) */
-  
+
+#define R_D_log(p)	(log_p	?  (p)	 : log(p))	/* log(p) */
+#define R_D_LExp(x)     (log_p ? atomic::robust_utils::R_Log1_Exp(x) : log1p(-x))
+#define R_D_exp(x)	(log_p	?  (x)	 : exp(x))	/* exp(x) */
+
+#define R_P_bounds_01(x, x_min, x_max)	\
+    if(x <= x_min) return R_DT_0;		\
+    if(x >= x_max) return R_DT_1
+    
+    
+#define R_Q_P01_boundaries(p, _LEFT_, _RIGHT_)		\
+    if (log_p) {					\
+	if(p > 0)					\
+	    ML_WARN_return_NAN;				\
+	if(p == 0) /* upper bound*/			\
+	    return lower_tail ? _RIGHT_ : _LEFT_;	\
+	if(p == ML_NEGINF)				\
+	    return lower_tail ? _LEFT_ : _RIGHT_;	\
+    }							\
+    else { /* !log_p */					\
+	if(p < 0 || p > 1)				\
+	    ML_WARN_return_NAN;				\
+	if(p == 0)					\
+	    return lower_tail ? _LEFT_ : _RIGHT_;	\
+	if(p == 1)					\
+	    return lower_tail ? _RIGHT_ : _LEFT_;	\
+    }
+
+    
+#define R_D_Lval(p)	(lower_tail ? (p) : (0.5 - (p) + 0.5))	/*  p  */
+/*#define R_DT_qIv(p)	R_D_Lval(R_D_qIv(p))		 *  p  in qF ! */
+#define R_DT_qIv(p)	(log_p ? (lower_tail ? exp(p) : - expm1(p)) \
+			       : R_D_Lval(p))
+
+/*#define R_DT_CIv(p)	R_D_Cval(R_D_qIv(p))		 *  1 - p in qF */
+#define R_DT_CIv(p)	(log_p ? (lower_tail ? -expm1(p) : exp(p)) \
+			       : R_D_Cval(p))
+
+
+
+
+template<class Float>
+static Float myfmod(Float x1, Float x2)
+{
+    Float q = x1 / x2;
+    return x1 - floor(q) * x2;
+}
+
+template<class Float>
+static Float myfmin2(Float x1, Float x2)
+{
+  return 0.5 * (x1 + x2) - 0.5 * fabs(x1 - x2);
+}
+
+    template<class Float>
+static Float myfmax2(Float x1, Float x2)
+{
+  return 0.5 * (x1 + x2) + 0.5 * fabs(x1 - x2);
+}
+
+    
     template<class Float>
     attribute_hidden
     void pnorm_both_raw(Float x, Float *cum, Float *ccum, int i_tail, int log_p)
@@ -356,15 +420,151 @@
 
 #endif
 
-
+#define R_D_qIv(p)	(log_p	? exp(p) : (p))		/*  p  in qF(p,..) */
 
 
 template<class Float>
-static Float myfmod(Float x1, Float x2)
-{
-    Float q = x1 / x2;
-    return x1 - floor(q) * x2;
+Float frexp2(Float x, int* e){
+  // Naïve
+  *e = (x == 0) ? 0 : (int)trunc(1 + log(x) / log(2.0));
+  return x * pow((Float)2.0, -(*e));
 }
+
+    template<class Float>
+    Float ldexp2(Float num, Float exp){
+      return num * pow((Float)2.0, exp);
+    }
+
+    
+    template<class Float>
+    Float qnorm5(Float p, Float mu, Float sigma, int lower_tail, int log_p)
+{
+    Float p_, q, r, val;
+
+#ifdef IEEE_754
+    if (ISNAN(p) || ISNAN(mu) || ISNAN(sigma))
+	return p + mu + sigma;
+#endif
+    R_Q_P01_boundaries(p, ML_NEGINF, ML_POSINF);
+
+    if(sigma  < 0)	ML_WARN_return_NAN;
+    if(sigma == 0)	return mu;
+
+    p_ = R_DT_qIv(p);/* real lower_tail prob. p */
+    q = p_ - 0.5;
+
+#ifdef DEBUG_qnorm
+    REprintf("qnorm(p=%10.7g, m=%g, s=%g, l.t.= %d, log= %d): q = %g\n",
+	     p,mu,sigma, lower_tail, log_p, q);
+#endif
+
+
+/*-- use AS 241 --- */
+/* double ppnd16_(double *p, long *ifault)*/
+/*      ALGORITHM AS241  APPL. STATIST. (1988) VOL. 37, NO. 3
+
+        Produces the normal deviate Z corresponding to a given lower
+        tail area of P; Z is accurate to about 1 part in 10**16.
+
+        (original fortran code used PARAMETER(..) for the coefficients
+         and provided hash codes for checking them...)
+*/
+    if (fabs(q) <= .425) {/* |p~ - 0.5| <= .425  <==> 0.075 <= p~ <= 0.925 */
+        r = .180625 - q * q; // = .425^2 - q^2  >= 0
+	val =
+            q * (((((((r * 2509.0809287301226727 +
+                       33430.575583588128105) * r + 67265.770927008700853) * r +
+                     45921.953931549871457) * r + 13731.693765509461125) * r +
+                   1971.5909503065514427) * r + 133.14166789178437745) * r +
+                 3.387132872796366608)
+            / (((((((r * 5226.495278852854561 +
+                     28729.085735721942674) * r + 39307.89580009271061) * r +
+                   21213.794301586595867) * r + 5394.1960214247511077) * r +
+                 687.1870074920579083) * r + 42.313330701600911252) * r + 1.);
+    }
+    else { /* closer than 0.075 from {0,1} boundary :
+	    *  r := log(p~);  p~ = min(p, 1-p) < 0.075 :  */
+	Float lp;
+	if(log_p && ((lower_tail && q <= 0) || (!lower_tail && q > 0))) {
+	    lp = p;
+	} else {
+	    lp = log( (q > 0) ? R_DT_CIv(p) /* 1-p */ : p_ /* = R_DT_Iv(p) ^=  p */);
+	}
+	// r = sqrt( - log(min(p,1-p)) )  <==>  min(p, 1-p) = exp( - r^2 ) :
+        r = sqrt(-lp);
+#ifdef DEBUG_qnorm
+	REprintf("\t close to 0 or 1: r = %7g\n", r);
+#endif
+        if (r <= 5.) { /* <==> min(p,1-p) >= exp(-25) ~= 1.3888e-11 */
+            r += -1.6;
+            val = (((((((r * 7.7454501427834140764e-4 +
+                       .0227238449892691845833) * r + .24178072517745061177) *
+                     r + 1.27045825245236838258) * r +
+                    3.64784832476320460504) * r + 5.7694972214606914055) *
+                  r + 4.6303378461565452959) * r +
+                 1.42343711074968357734)
+                / (((((((r *
+                         1.05075007164441684324e-9 + 5.475938084995344946e-4) *
+                        r + .0151986665636164571966) * r +
+                       .14810397642748007459) * r + .68976733498510000455) *
+                     r + 1.6763848301838038494) * r +
+                    2.05319162663775882187) * r + 1.);
+        }
+	else if(r <= 27) { /* p is very close to  0 or 1: r in (5, 27] :
+		*  r >   5 <==> min(p,1-p)  < exp(-25) = 1.3888..e-11
+		*  r <= 27 <==> min(p,1-p) >= exp(-27^2) = exp(-729) ~= 2.507972e-317
+		* i.e., we are just barely in the range where min(p, 1-p) has not yet underflowed to zero.
+		*/
+	    // Wichura, p.478: minimax rational approx R_3(t) is for 5 <= t <= 27  (t :== r)
+            r += -5.;
+            val = (((((((r * 2.01033439929228813265e-7 +
+                       2.71155556874348757815e-5) * r +
+                      .0012426609473880784386) * r + .026532189526576123093) *
+                    r + .29656057182850489123) * r +
+                   1.7848265399172913358) * r + 5.4637849111641143699) *
+                 r + 6.6579046435011037772)
+                / (((((((r *
+                         2.04426310338993978564e-15 + 1.4215117583164458887e-7)*
+                        r + 1.8463183175100546818e-5) * r +
+                       7.868691311456132591e-4) * r + .0148753612908506148525)
+                     * r + .13692988092273580531) * r +
+                    .59983220655588793769) * r + 1.);
+        }
+        else { // r > 27: p is *really* close to 0 or 1 .. practically only when log_p =TRUE
+	    if(r >= 6.4e8) { // p is *very extremely* close to 0 or 1
+		// Using the asymptotical formula ("0-th order"): qn = sqrt(2*s)
+		val = r * M_SQRT2;
+	    } else {
+	      Float s2 = -ldexp2((Float)lp, (Float)1), // = -2*lp = 2s
+		    x2 = s2 - log(M_2PI * s2); // = xs_1
+		// if(r >= 36000.)  # <==> s >= 36000^2   use x2 = xs_1  above
+		if(r < 36000.) {
+		    x2 = s2 - log(M_2PI * x2) - 2./(2. + x2); // == xs_2
+		    if(r < 840.) { // 27 < r < 840
+			x2 = s2 - log(M_2PI * x2) + 2*log1p(- (1 - 1/(4 + x2))/(2. + x2)); // == xs_3
+			if(r < 109.) { // 27 < r < 109
+			  x2 = s2 - log(M_2PI * x2) +
+			      2*log1p(- (1 - (1 - 5/(6 + x2))/(4. + x2))/(2. + x2)); // == xs_4
+			  if(r < 55.) { // 27 < r < 55
+			    x2 = s2 - log(M_2PI * x2) +
+			      2*log1p(- (1 - (1 - (5 - 9/(8. + x2))/(6. + x2))/(4. + x2))/(2. + x2)); // == xs_5
+			  }
+			}
+		    }
+		}
+                val = sqrt(x2);
+	    }
+	}
+	if(q < 0.0)
+	    val = -val;
+    }
+    return mu + sigma * val;
+}
+
+
+
+
+    
 
     
 template<class Float>
@@ -494,7 +694,8 @@ Float attribute_hidden chebyshev_eval(Float x, std::vector<Float> a, const int n
     return (b0 - b2) * 0.5;
 }
 
-
+template<class Float>
+Float lgammafn(Float x);
 
 /*
  *  AUTHOR
@@ -545,6 +746,11 @@ Float attribute_hidden chebyshev_eval(Float x, std::vector<Float> a, const int n
 
  *     stirlerr(n), stirlerr(x), stirlerr(n-x) from binom_raw(x, n, ..) for all possible 0 < x < n
  */
+
+
+ template<class Float>
+ Float lgamma1p (Float a);
+
 
 template<class Float>
 Float attribute_hidden stirlerr(Float n)
@@ -614,7 +820,7 @@ Float attribute_hidden stirlerr(Float n)
 	if (n <= 5.25) {
 	    if(n >= 1.) { // "MM2"; slightly more accurate than direct form
 		Float l_n = log(n);	      // ldexp(u, -1) == u/2
-		return lgamma(n) + n*(1 - l_n) + ldexp(l_n - M_LN_2PI, -1);
+		return lgammafn(n) + n*(1 - l_n) + ldexp2((Float)(l_n - M_LN_2PI), (Float)-1);
 	    }
 	    else // n < 1
 		return lgamma1p(n) - (n + 0.5)*log(n) + n - M_LN_SQRT_2PI;
@@ -1271,6 +1477,540 @@ Float pt(Float x, Float n, int lower_tail, int log_p)
     else {
 	val /= 2.;
 	return R_D_Cval(val);
+    }
+}
+
+template<class Float>
+Float Rtanpi(Float x)
+{
+#ifdef IEEE_754
+    if (ISNAN(x)) return x;
+#endif
+    if(!R_FINITE(x)) ML_WARN_return_NAN;
+
+    x = myfmod((Float)x, (Float)1.); // tan(pi(x + k)) == tan(pi x)  for all integer k
+    // map (-1,1] --> (-1/2, 1/2] :
+    if(x <= -0.5){
+      x = x + 1.0;
+    }else if(x > 0.5){
+      x = x - 1.0;
+    }
+    return (x == 0.) ? 0. :
+	((x ==  0.5 ) ? ML_NAN :
+	((x ==  0.25) ?  1. :
+	((x == -0.25) ? -1. :
+			tan(M_PI * x)
+	    )));
+}
+
+
+template<class Float>
+Float qt(Float p, Float ndf, int lower_tail, int log_p)
+{
+  const static Float eps = 1.e-12;
+
+  Float P, q;
+
+#ifdef IEEE_754
+  if (ISNAN(p) || ISNAN(ndf))
+    return p + ndf;
+#endif
+
+  R_Q_P01_boundaries(p, ML_NEGINF, ML_POSINF);
+
+  if (ndf <= 0) ML_WARN_return_NAN;
+
+  if (ndf < 1) { /* based on qnt */
+    const static Float accu = 1e-13;
+    const static Float Eps = 1e-11; /* must be > accu */
+
+    Float ux, lx, nx, pp;
+
+    int iter = 0;
+
+    p = R_DT_qIv(p);
+
+    /* Invert pt(.) :
+     * 1. finding an upper and lower bound */
+    if(p > 1 - DBL_EPSILON) return ML_POSINF;
+    pp = myfmin2((Float)(1 - DBL_EPSILON), (Float)(p * (1 + Eps)));
+    //pp = 0.5 * ((1 - DBL_EPSILON) + (p * (1 + Eps))) - 0.5 * fabs(((1 - DBL_EPSILON) - (p * (1 + Eps))));
+    for(ux = 1.; ux < DBL_MAX && pt(ux, ndf, TRUE, FALSE) < pp; ux *= 2);
+    pp = p * (1 - Eps);
+    for(lx =-1.; lx > -DBL_MAX && pt(lx, ndf, TRUE, FALSE) > pp; lx *= 2);
+
+    /* 2. interval (lx,ux)  halving
+       regula falsi failed on qt(0.1, 0.1)
+    */
+    do {
+      nx = 0.5 * (lx + ux);
+      if (pt(nx, ndf, TRUE, FALSE) > p) ux = nx; else lx = nx;
+    } while ((ux - lx) / fabs(nx) > accu && ++iter < 1000);
+
+    if(iter >= 1000) ML_WARNING(ME_PRECISION, "qt");
+
+    return 0.5 * (lx + ux);
+  }
+
+  /* Old comment:
+   * FIXME: "This test should depend on  ndf  AND p  !!
+   * -----  and in fact should be replaced by
+   * something like Abramowitz & Stegun 26.7.5 (p.949)"
+   *
+   * That would say that if the qnorm value is x then
+   * the result is about x + (x^3+x)/4df + (5x^5+16x^3+3x)/96df^2
+   * The differences are tiny even if x ~ 1e5, and qnorm is not
+   * that accurate in the extreme tails.
+   */
+  if (ndf > 1e20) return qnorm5(p, (Float)0., (Float)1., lower_tail, log_p);
+
+  P = R_D_qIv(p); /* if exp(p) underflows, we fix below */
+
+  bool neg = (!lower_tail || P < 0.5) && (lower_tail || P > 0.5);
+  bool is_neg_lower = (lower_tail == neg); /* both TRUE or FALSE == !xor */
+  if(neg)
+    P = 2 * (log_p ? (lower_tail ? P : -expm1(p)) : R_D_Lval(p));
+  else
+    P = 2 * (log_p ? (lower_tail ? -expm1(p) : P) : R_D_Cval(p));
+  /* 0 <= P <= 1 ; P = 2*min(P', 1 - P')  in all cases */
+
+  if (fabs(ndf - 2) < eps) {	/* df ~= 2 */
+    if(P > DBL_MIN) {
+      if(3* P < DBL_EPSILON) /* P ~= 0 */
+	q = 1 / sqrt(P);
+      else if (P > 0.9)	   /* P ~= 1 */
+	q = (1 - P) * sqrt(2 /(P * (2 - P)));
+      else /* eps/3 <= P <= 0.9 */
+	q = sqrt(2 / (P * (2 - P)) - 2);
+    }
+    else { /* P << 1, q = 1/sqrt(P) = ... */
+      if(log_p)
+	q = is_neg_lower ? exp(- p/2) / M_SQRT2 : 1/sqrt(-expm1(p));
+      else
+	q = ML_POSINF;
+    }
+  }
+  else if (ndf < 1 + eps) { /* df ~= 1  (df < 1 excluded above): Cauchy */
+    if(P == 1.) q = 0; // some versions of tanpi give Inf, some NaN
+    else if(P > 0)
+      q = ((Float)1)/Rtanpi(P/(Float)2.);/* == - tan((P+1) * M_PI_2) -- suffers for P ~= 0 */
+
+    else { /* P = 0, but maybe = 2*exp(p) ! */
+      if(log_p) /* 1/tan(e) ~ 1/e */
+	q = is_neg_lower ? M_1_PI * exp(-p) : -1./(M_PI * expm1(p));
+      else
+	q = ML_POSINF;
+    }
+  }
+  else {		/*-- usual case;  including, e.g.,  df = 1.1 */
+    Float x = 0., y, log_P2 = 0./* -Wall */,
+      a = 1 / (ndf - 0.5),
+      b = 48 / (a * a),
+      c = ((20700 * a / b - 98) * a - 16) * a + 96.36,
+      d = ((94.5 / (b + c) - 3) / b + 1) * sqrt(a * M_PI_2) * ndf;
+    bool
+      P_ok1 = P > DBL_MIN || !log_p,
+      P_ok  = P_ok1; // when true (after check below), use "normal scale": log_p=FALSE
+    if(P_ok1) {
+      y = pow(d * P, 2.0 / ndf);
+      P_ok = (y >= DBL_EPSILON);
+    }
+    if(!P_ok) {// log.p && P very.small  ||  (d*P)^(2/df) =: y < eps_c
+      log_P2 = is_neg_lower ? R_D_log(p) : R_D_LExp(p); /* == log(P / 2) */
+      x = (log(d) + M_LN2 + log_P2) / ndf;
+      y = exp(2 * x);
+    }
+
+    if ((ndf < 2.1 && P > 0.5) || y > 0.05 + a) { /* P > P0(df) */
+      /* Asymptotic inverse expansion about normal */
+      if(P_ok)
+	x = qnorm5((Float)(0.5 * P), (Float)0., (Float)1., /*lower_tail*/TRUE,  /*log_p*/FALSE);
+      else /* log_p && P underflowed */
+	x = qnorm5((Float)log_P2,  (Float)0., (Float)1., lower_tail,	        /*log_p*/ TRUE);
+
+      y = x * x;
+      if (ndf < 5)
+	c += 0.3 * (ndf - 4.5) * (x + 0.6);
+      c = (((0.05 * d * x - 5) * x - 7) * x - 2) * x + b + c;
+      y = (((((0.4 * y + 6.3) * y + 36) * y + 94.5) / c
+	    - y - 3) / b + 1) * x;
+      y = expm1(a * y * y);
+      q = sqrt(ndf * y);
+    } else if(!P_ok && x < - M_LN2 * DBL_MANT_DIG) {/* 0.5* log(DBL_EPSILON) */
+      /* y above might have underflown */
+      q = sqrt(ndf) * exp(-x);
+    }
+    else { /* re-use 'y' from above */
+      y = ((1 / (((ndf + 6) / (ndf * y) - 0.089 * d - 0.822)
+		 * (ndf + 2) * 3) + 0.5 / (ndf + 4))
+	   * y - 1) * (ndf + 1) / (ndf + 2) + 1 / y;
+      q = sqrt(ndf * y);
+    }
+
+
+    /* Now apply 2-term Taylor expansion improvement (1-term = Newton):
+     * as by Hill (1981) [ref.above] */
+
+    /* FIXME: This can be far from optimal when log_p = TRUE
+     *      but is still needed, e.g. for qt(-2, df=1.01, log=TRUE).
+     *	Probably also improvable when  lower_tail = FALSE */
+
+    if(P_ok1) {
+      Float M = fabs(sqrt(DBL_MAX/2.) - ndf);
+      int it=0;
+      while(it++ < 10 && (y = dt(q, ndf, FALSE)) > 0 &&
+	    R_FINITE(x = (pt(q, ndf, FALSE, FALSE) - P/2) / y) &&
+	    fabs(x) > 1e-14*fabs(q)) {
+	/* Newton (=Taylor 1 term):
+	 *  q += x;
+	 * Taylor 2-term : */
+	Float F = (fabs(q) < M) ?
+	  q * (ndf + 1) / (2 * (q * q + ndf)) :
+	  (ndf + 1) / (2 * (q     + ndf/q)),
+	  del_q = x * (1. + x * F);
+	if(R_FINITE(del_q) && R_FINITE(q + del_q))
+	  q += del_q;
+	else if(R_FINITE(x) && R_FINITE(q + x))
+	  q += x;
+	else // FIXME??  if  q+x = +/-Inf is *better* than q should use it
+	  break; // cannot improve  q  with a Newton/Taylor step
+      }
+    }
+  }
+  return neg ? -q : q;
+}
+
+
+/*
+ *  Algorithm AS 275 Appl.Statist. (1992), vol.41, no.2
+ *  original  (C) 1992	     Royal Statistical Society
+ *
+ *  Computes the noncentral chi-squared distribution function with
+ *  positive real degrees of freedom df and nonnegative noncentrality
+ *  parameter ncp.  pnchisq_raw is based on
+ *
+ *    Ding, C. G. (1992)
+ *    Algorithm AS275: Computing the non-central chi-squared
+ *    distribution function. Appl.Statist., 41, 478-482.
+
+ *  Other parts
+ *  Copyright (C) 2000-2019  The R Core Team
+ *  Copyright (C) 2003-2015  The R Foundation
+ */
+
+/*
+ * Modified 2024-09-10 Christoffer Moesgaard Albertsen, Technical University of Denmark (cmoe@aqua.dtu.dk)
+ */
+
+static const double _dbl_min_exp = M_LN2 * DBL_MIN_EXP;
+
+// template<class Float>
+// Float pgamma(Float x, Float alph, Float scale, int lower_tail, int log_p);
+
+    #include "pgamma.hpp"
+
+
+/*
+ *  Mathlib : A C Library of Special Functions
+ *  Copyright (C) 1998	Ross Ihaka
+ *  Copyright (C) 2000	The R Core Team
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful, but
+ *  WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, a copy is available at
+ *  https://www.R-project.org/Licenses/
+ *
+ *  DESCRIPTION
+ *
+ *     The distribution function of the chi-squared distribution.
+ */
+template<class Float>
+Float pchisq(Float x, Float df, int lower_tail, int log_p)
+{
+  Float v = pgamma((Float)x, (Float)(df/2.), (Float)2., (int)lower_tail, (int)log_p);
+  return v;
+}
+
+
+template<class Float>
+Float attribute_hidden
+pnchisq_raw(Float x, Float f, Float theta /* = ncp */,
+	    Float errmax, Float reltol, int itrmax,
+	    int lower_tail, int log_p)
+{
+    Float lam, x2, f2, term, bound, f_x_2n, f_2n;
+    Float l_lam = -1., l_x = -1.; /* initialized for -Wall */
+    int n;
+    bool lamSml, tSml, is_r, is_b;
+    Float ans, u, v, t, lt, lu =-1;
+
+    if (x <= 0.) {
+	if(x == 0. && f == 0.) { // chi^2_0(.) has point mass at zero
+#define _L  (-0.5 * theta) // = -lambda
+	    return lower_tail ? R_D_exp(_L) : (log_p ? atomic::robust_utils::R_Log1_Exp(_L) : -expm1(_L));
+	}
+	/* x < 0  or {x==0, f > 0} */
+	return R_DT_0;
+    }
+    if(!R_FINITE(x))	return R_DT_1;
+    
+    /* This is principally for use from qnchisq */
+#ifndef MATHLIB_STANDALONE
+    R_CheckUserInterrupt();
+#endif
+
+    if(theta < 80) { /* use 110 for Inf, as ppois(110, 80/2, lower.tail=FALSE) is 2e-20 */
+	Float ans;
+	int i;
+	// Have  pgamma(x,s) < x^s / Gamma(s+1) (< and ~= for small x)
+	// ==> pchisq(x, f) = pgamma(x, f/2, 2) = pgamma(x/2, f/2)
+	//                  <  (x/2)^(f/2) / Gamma(f/2+1) < eps
+	// <==>  f/2 * log(x/2) - log(Gamma(f/2+1)) < log(eps) ( ~= -708.3964 )
+	// <==>        log(x/2) < 2/f*(log(Gamma(f/2+1)) + log(eps))
+	// <==> log(x) < log(2) + 2/f*(log(Gamma(f/2+1)) + log(eps))
+	if(lower_tail && f > 0. &&
+	   log(x) < M_LN2 + 2/f*(lgammafn(f/2. + 1) + _dbl_min_exp)) {
+	    // all  pchisq(x, f+2*i, lower_tail, FALSE), i=0,...,110 would underflow to 0.
+	    // ==> work in log scale
+	    Float lambda = 0.5 * theta; // < 40
+	    Float sum, sum2, pr = -lambda, log_lam = log(lambda);
+	    sum = sum2 = ML_NEGINF;
+	    /* we need to renormalize here: the result could be very close to 1 */
+	    for(i = 0; i < 110;  pr += log_lam - log(++i)) {
+		sum2 = logspace_add(sum2, pr);
+		sum  = logspace_add((Float)sum , (Float)(pr + pchisq(x, (Float)(f+2*i), (int)lower_tail, (int)TRUE)));
+		if (sum2 >= -1e-15) /*<=> EXP(sum2) >= 1-1e-15 */ break;
+	    }
+	    ans = sum - sum2;
+#ifdef DEBUG_pnch
+	    REprintf("pnchisq(x=%g, f=%g, th.=%g); th. < 80, logspace: i=%d, ans=(sum=%g)-(sum2=%g)\n",
+		     x,f,theta, i, (Float)sum, (Float)sum2);
+#endif
+	    return (Float) (log_p ? ans : exp(ans));
+	}
+	else {
+	    Float lambda = 0.5 * theta; // < 40
+	    Float sum = 0, sum2 = 0, pr = exp(-lambda); // does this need a feature test?
+	    /* we need to renormalize here: the result could be very close to 1 */
+	    for(i = 0; i < 110;  pr *= lambda/++i) {
+		// pr == exp(-lambda) lambda^i / i!  ==  dpois(i, lambda)
+		sum2 += pr;
+		// pchisq(*, i, *) is  strictly decreasing to 0 for lower_tail=TRUE
+		//                 and strictly increasing to 1 for lower_tail=FALSE
+		sum += pr * pchisq(x, (Float)(f+2*i), (int)lower_tail, (int)FALSE);
+		if (sum2 >= 1-1e-15) break;
+	    }
+	    ans = sum/sum2;
+#ifdef DEBUG_pnch
+	    REprintf("pnchisq(x=%g, f=%g, theta=%g); theta < 80: i=%d, sum=%g, sum2=%g\n",
+		     x,f,theta, i, (Float)sum, (Float)sum2);
+#endif
+	    return (Float) (log_p ? log(ans) : ans);
+	}
+    } // if(theta < 80)
+
+    // else: theta == ncp >= 80 --------------------------------------------
+#ifdef DEBUG_pnch
+    REprintf("pnchisq(x=%g, f=%g, theta=%g >= 80): ",x,f,theta);
+#endif
+    // Series expansion ------- FIXME: log_p=TRUE, lower_tail=FALSE only applied at end ==> underflow
+
+    lam = .5 * theta; // = lambda = ncp/2
+    lamSml = (-lam < _dbl_min_exp);
+    if(lamSml) {
+	// originally error: "non centrality parameter too large for current algorithm"
+        u = 0;
+        lu = -lam;/* == ln(u) */
+        l_lam = log(lam);
+    } else {
+	u = exp(-lam);
+    }
+
+    /* evaluate the first term */
+    v = u;
+    x2 = .5 * x;
+    f2 = .5 * f;
+    f_x_2n = f - x;
+
+#ifdef DEBUG_pnch
+    REprintf("-- v=exp(-th/2)=%g, x/2= %g, f/2= %g\n",v,x2,f2);
+#endif
+
+    if(f2 * DBL_EPSILON > 0.125 && /* very large f and x ~= f: probably needs */
+       fabs(t = x2 - f2) <         /* another algorithm anyway */
+       sqrt(DBL_EPSILON) * f2) {
+	/* evade cancellation error */
+	/* t = exp((1 - t)*(2 - t/(f2 + 1))) / sqrt(2*M_PI*(f2 + 1));*/
+        lt = (1 - t)*(2 - t/(f2 + 1)) - M_LN_SQRT_2PI - 0.5 * log(f2 + 1);
+#ifdef DEBUG_pnch
+	REprintf(" (case I) ==> ");
+#endif
+    }
+    else {
+	/* Usual case 2: careful not to overflow .. : */
+	lt = f2*log(x2) -x2 - lgammafn(f2 + 1);
+    }
+#ifdef DEBUG_pnch
+    REprintf(" lt= %g", lt);
+#endif
+
+    tSml = (lt < _dbl_min_exp);
+    if(tSml) {
+#ifdef DEBUG_pnch
+	REprintf(" is very small\n");
+#endif
+	if (x > f + theta +  5* sqrt( 2*(f + 2*theta))) {
+	    /* x > E[X] + 5* sigma(X) */
+	    return R_DT_1; /* FIXME: could be more accurate than 0. */
+	} /* else */
+	l_x = log(x);
+	ans = term = 0.; t = 0;
+    }
+    else {
+	t = exp(lt);
+#ifdef DEBUG_pnch
+ 	REprintf(", t=exp(lt)= %g\n", t);
+#endif
+	ans = term = (Float) (v * t);
+    }
+
+    for (n = 1, f_2n = f + 2., f_x_2n += 2.; n <= itrmax ; n++, f_2n += 2, f_x_2n += 2) {
+#ifdef DEBUG_pnch_n
+	if(n % 1000 == 0)
+	    REprintf("\n _OL_: n=%d,  f_x_2n = %g", n);
+	else REprintf(n % 100 == 0 ? ".\n" : ".");
+#endif
+#ifndef MATHLIB_STANDALONE
+	if(n % 1000 == 0) R_CheckUserInterrupt();
+#endif
+	/* f_2n    === f + 2*n
+	 * f_x_2n  === f - x + 2*n   > 0  <==> (f+2n)  >   x */
+	if (f_x_2n > 0) {
+	    /* find the error bound and check for convergence */
+
+	    bound = (Float) (t * x / f_x_2n);
+#ifdef DEBUG_pnch_n
+	    if(n % 1000 == 0)
+		REprintf("\n L10: n=%d; term, ans = %g, %g; bound= %g",
+			 n, term, ans, bound);
+#endif
+	    is_r = FALSE;
+	    /* convergence only if BOTH absolute and relative error < 'bnd' */
+	    if (((is_b = (bound <= errmax)) &&
+                 (is_r = (term <= reltol * ans))))
+            {
+#ifdef DEBUG_pnch
+		REprintf("BREAK from for(n=1 ..): n=%d; bound= %g %s; term=%g, rel.err= %g %s\n",
+			 n,
+			 bound, (is_b ? "<= errmax" : ""), term,
+			 term/ans, (is_r ? "<= reltol" : ""));
+#endif
+		break; /* out completely */
+            }
+	}
+
+	/* evaluate the next term of the */
+	/* expansion and then the partial sum */
+
+        if(lamSml) {
+            lu += l_lam - log(n); /* u = u* lam / n */
+            if(lu >= _dbl_min_exp) {
+		/* no underflow anymore ==> change regime */
+#ifdef DEBUG_pnch_n
+                REprintf(" n=%d; nomore underflow in u = exp(lu) ==> change\n",
+			 n);
+#endif
+                v = u = exp(lu); /* the first non-0 'u' */
+                lamSml = FALSE;
+            }
+        } else {
+	    u *= lam / n;
+	    v += u;
+	}
+	if(tSml) {
+            lt += l_x - log(f_2n);/* t <- t * (x / f2n) */
+            if(lt >= _dbl_min_exp) {
+		/* no underflow anymore ==> change regime */
+#ifdef DEBUG_pnch
+                REprintf("  n=%d; nomore underflow in t = exp(lt) ==> change\n", n);
+#endif
+                t = exp(lt); /* the first non-0 't' */
+                tSml = FALSE;
+            }
+        } else {
+	    t *= x / f_2n;
+	}
+        if(!lamSml && !tSml) {
+	    term = (Float) (v * t);
+	    ans += term;
+	}
+
+    } /* for(n ...) */
+
+    if (n > itrmax) {
+	MATHLIB_WARNING4(_("pnchisq(x=%g, f=%g, theta=%g, ..): not converged in %d iter."),
+			 x, f, theta, itrmax);
+    }
+#ifdef DEBUG_pnch
+    REprintf("\n == L_End: n=%d; term= %g; bound=%g: ans=%Lg\n",
+	     n, term, bound, ans);
+#endif
+    Float dans = (Float) ans;
+    return R_DT_val(dans);
+}
+
+
+
+template<class Float>
+Float pnchisq(Float x, Float df, Float ncp, int lower_tail, int log_p)
+{
+    Float ans;
+#ifdef IEEE_754
+    if (ISNAN(x) || ISNAN(df) || ISNAN(ncp))
+	return x + df + ncp;
+    if (!R_FINITE(df) || !R_FINITE(ncp))
+	ML_WARN_return_NAN;
+#endif
+
+    if (df < 0. || ncp < 0.) ML_WARN_return_NAN;
+
+    ans = pnchisq_raw((Float)x, (Float)df, (Float)ncp, (Float)1e-12, (Float)(8*DBL_EPSILON), 1000000, (int)lower_tail, (int)log_p);
+
+    if (x <= 0. || x == ML_POSINF)
+	return ans; // because it's perfect
+
+    if(ncp >= 80) {
+	if(lower_tail) {
+	  ans = myfmin2(ans, (Float)R_D__1);  /* e.g., pchisq(555, 1.01, ncp = 80) */
+	} else { /* !lower_tail */
+	    /* since we computed the other tail cancellation is likely */
+	    // FIXME: There are cases where  ans == 0. if(!log_p) is perfect
+	    if(ans < (log_p ? (-10. * M_LN10) : 1e-10)) ML_WARNING(ME_PRECISION, "pnchisq");
+	    if(!log_p && ans < 0.) ans = 0.;  /* Precaution PR#7099 */
+	}
+    }
+    /* MM: the following "hack" from c51179 (<--> PR#14216, by Jerry Lewis)
+     * -- is "kind of ok" ... but potentially suboptimal: we do  log1p(- p(*, <other tail>, log=FALSE)),
+     *    but that  p(*, log=FALSE) may already be an exp(.) or even expm1(..)
+     *   <---> "in principle"  this check should happen there, not here  */
+    if (!log_p || ans < -1e-8)
+	return ans;
+    else { // log_p (==> ans <= 0) &&  -1e-8 <= ans <= 0
+	// prob. = exp(ans) is near one: we can do better using the other tail
+#ifdef DEBUG_pnch
+	REprintf("   pnchisq_raw(*, log_p): ans=%g => 2nd call, other tail\n", ans);
+#endif
+	ans = pnchisq_raw((Float)x, (Float)df, (Float)ncp, (Float)1e-12, (Float)(8*DBL_EPSILON), 1000000, (int)!lower_tail, (int)FALSE);
+	return log1p(-ans);
     }
 }
 
