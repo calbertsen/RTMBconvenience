@@ -261,35 +261,35 @@ BEGIN_RCPP
 END_RCPP
 }
 // sparse_solve_ad
-ADrep sparse_solve_ad(Rcpp::S4& x, ADrep& y);
+ADrep sparse_solve_ad(Rcpp::RObject& x, ADrep& y);
 RcppExport SEXP _RTMBconvenience_sparse_solve_ad(SEXP xSEXP, SEXP ySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::S4& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< Rcpp::RObject& >::type x(xSEXP);
     Rcpp::traits::input_parameter< ADrep& >::type y(ySEXP);
     rcpp_result_gen = Rcpp::wrap(sparse_solve_ad(x, y));
     return rcpp_result_gen;
 END_RCPP
 }
 // sparse_solve_ptr_ad
-Rcpp::XPtr<Eigen::SparseLU< Eigen::SparseMatrix<ad>, Eigen::COLAMDOrdering<int> >> sparse_solve_ptr_ad(Rcpp::S4& x);
+Rcpp::XPtr<Eigen::SparseLU< Eigen::SparseMatrix<ad>, Eigen::COLAMDOrdering<int> >> sparse_solve_ptr_ad(Rcpp::RObject& x);
 RcppExport SEXP _RTMBconvenience_sparse_solve_ptr_ad(SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::S4& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< Rcpp::RObject& >::type x(xSEXP);
     rcpp_result_gen = Rcpp::wrap(sparse_solve_ptr_ad(x));
     return rcpp_result_gen;
 END_RCPP
 }
 // sparse_solve_ptr_update_ad
-void sparse_solve_ptr_update_ad(Rcpp::XPtr<Eigen::SparseLU< Eigen::SparseMatrix<ad>, Eigen::COLAMDOrdering<int> >>& ss, Rcpp::S4& x);
+void sparse_solve_ptr_update_ad(Rcpp::XPtr<Eigen::SparseLU< Eigen::SparseMatrix<ad>, Eigen::COLAMDOrdering<int> >>& ss, Rcpp::RObject& x);
 RcppExport SEXP _RTMBconvenience_sparse_solve_ptr_update_ad(SEXP ssSEXP, SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::XPtr<Eigen::SparseLU< Eigen::SparseMatrix<ad>, Eigen::COLAMDOrdering<int> >>& >::type ss(ssSEXP);
-    Rcpp::traits::input_parameter< Rcpp::S4& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< Rcpp::RObject& >::type x(xSEXP);
     sparse_solve_ptr_update_ad(ss, x);
     return R_NilValue;
 END_RCPP

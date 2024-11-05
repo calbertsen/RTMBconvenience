@@ -3,7 +3,7 @@
 #include "RTMBconvenience_types.hpp"
 
 // [[Rcpp::export]]
-ADrep sparse_solve_ad(Rcpp::S4 &x, ADrep &y){
+ADrep sparse_solve_ad(Rcpp::RObject &x, ADrep &y){
 
   ConstMapMatrix Ey = MatrixInput(y);
   Eigen::SparseMatrix<ad> Ex = SparseInput(x);
@@ -15,7 +15,7 @@ ADrep sparse_solve_ad(Rcpp::S4 &x, ADrep &y){
 }
 
 // [[Rcpp::export]]
-Rcpp::XPtr<Eigen::SparseLU< Eigen::SparseMatrix<ad>, Eigen::COLAMDOrdering<int> >> sparse_solve_ptr_ad(Rcpp::S4 &x){
+Rcpp::XPtr<Eigen::SparseLU< Eigen::SparseMatrix<ad>, Eigen::COLAMDOrdering<int> >> sparse_solve_ptr_ad(Rcpp::RObject &x){
 
   Eigen::SparseMatrix<ad> Ex = SparseInput(x);
   typedef Eigen::SparseLU< Eigen::SparseMatrix<ad>, Eigen::COLAMDOrdering<int> > SpSolver;
@@ -26,7 +26,7 @@ Rcpp::XPtr<Eigen::SparseLU< Eigen::SparseMatrix<ad>, Eigen::COLAMDOrdering<int> 
 }
 
 // [[Rcpp::export]]
-void sparse_solve_ptr_update_ad(Rcpp::XPtr<Eigen::SparseLU< Eigen::SparseMatrix<ad>, Eigen::COLAMDOrdering<int> >> &ss, Rcpp::S4 &x){
+void sparse_solve_ptr_update_ad(Rcpp::XPtr<Eigen::SparseLU< Eigen::SparseMatrix<ad>, Eigen::COLAMDOrdering<int> >> &ss, Rcpp::RObject &x){
   Eigen::SparseMatrix<ad> Ex = SparseInput(x);  
   ss->factorize(Ex);
   return;
