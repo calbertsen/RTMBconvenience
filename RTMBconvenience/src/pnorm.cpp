@@ -215,7 +215,7 @@ ADrep pnchisq_ad(ADrep x, ADrep df, ADrep ncp, bool lower_tail, bool log_p ) {
   const ad* X1 = adptr(x); const ad* X2 = adptr(df); const ad* X3 = adptr(ncp);
   ad* Y = adptr(ans);
   for (int i=0; i<n; i++) Y[i] = pnchisq_(X1[i % n1], X2[i % n2], X3[i % n3], lower_tail, log_p);
-  return as_advector(ans);
+  return ans;
 }
 
 
@@ -246,7 +246,7 @@ ADrep pnorm5_ad(ADrep x, ADrep mu, ADrep sigma, bool lower_tail, bool log_p ) {
   const ad* X1 = adptr(x); const ad* X2 = adptr(mu); const ad* X3 = adptr(sigma);
   ad* Y = adptr(ans);
   for (int i=0; i<n; i++) Y[i] = pnorm5_(X1[i % n1], X2[i % n2], X3[i % n3], lower_tail, log_p);
-  return as_advector(ans);
+  return ans;
 }
 
 
@@ -276,7 +276,7 @@ ADrep qnorm5_ad(ADrep x, ADrep mu, ADrep sigma, bool lower_tail, bool log_p ) {
   const ad* X1 = adptr(x); const ad* X2 = adptr(mu); const ad* X3 = adptr(sigma);
   ad* Y = adptr(ans);
   for (int i=0; i<n; i++) Y[i] = qnorm5_(X1[i % n1], X2[i % n2], X3[i % n3], lower_tail, log_p);
-  return as_advector(ans);
+  return ans;
 }
 
 
@@ -306,7 +306,7 @@ ADrep log_ipnorm_ad(ADrep x, ADrep y, ADrep mu, ADrep sigma) {
   const ad* X1 = adptr(x); const ad* X2 = adptr(y); const ad* X3 = adptr(mu); const ad* X4 = adptr(sigma);
   ad* Y = adptr(ans);
   for (int i=0; i<n; i++) Y[i] = log_ipnorm_(X1[i % n1], X2[i % n2], X3[i % n3], X4[i % n4]);
-  return as_advector(ans);
+  return ans;
 }
 
 
@@ -335,7 +335,7 @@ ADrep pt_ad(ADrep x, ADrep df, bool lower_tail, bool log_p ) {
   const ad* X1 = adptr(x); const ad* X2 = adptr(df);
   ad* Y = adptr(ans);
   for (int i=0; i<n; i++) Y[i] = pt_(X1[i % n1], X2[i % n2], lower_tail, log_p);
-  return as_advector(ans);
+  return ans;
 }
 
 
@@ -365,7 +365,7 @@ ADrep qt_ad(ADrep p, ADrep df, bool lower_tail, bool log_p ) {
   const ad* X1 = adptr(p); const ad* X2 = adptr(df);
   ad* Y = adptr(ans);
   for (int i=0; i<n; i++) Y[i] = qt_(X1[i % n1], X2[i % n2], lower_tail, log_p);
-  return as_advector(ans);
+  return ans;
 }
 
 
@@ -387,7 +387,7 @@ ADrep pde_scheme_ad(ADrep x) {
   const ad* X1 = adptr(x);
   ad* Y = adptr(ans);
   for (int i=0; i<n; i++) Y[i] = ps_(X1[i]);
-  return as_advector(ans);
+  return ans;
 }
 
 
@@ -415,7 +415,7 @@ ADrep logspace_add_ad(ADrep x, ADrep y) {
   const ad* X1 = adptr(x); const ad* X2 = adptr(y);
   ad* Y = adptr(ans);
   for (int i=0; i<n; i++) Y[i] = logspace_add2(X1[i % n1], X2[i % n2]);
-  return as_advector(ans);
+  return ans;
 }
 
 // [[Rcpp::export]]
@@ -426,7 +426,7 @@ ADrep logspace_sum_ad(ADrep x) {
   ad* Y = adptr(ans);
   Y[0] = X1[0];
   for (int i=1; i<n; i++) Y[0] = logspace_add2(X1[i], Y[0]);
-  return as_advector(ans);
+  return ans;
 }
 
 
@@ -453,7 +453,7 @@ ADrep logspace_sub_ad(ADrep x, ADrep y) {
   const ad* X1 = adptr(x); const ad* X2 = adptr(y);
   ad* Y = adptr(ans);
   for (int i=0; i<n; i++) Y[i] = logspace_sub2(X1[i % n1], X2[i % n2]);
-  return as_advector(ans);
+  return ans;
 }
 
 
@@ -477,7 +477,7 @@ ADrep quantreg_ad(ADrep x, ADrep tau) {
   const ad* X1 = adptr(x); const ad* X2 = adptr(tau);
   ad* Y = adptr(ans);
   for (int i=0; i<n; i++) Y[i] = quantreg_(X1[i % n1], X2[i % n2]);
-  return as_advector(ans);
+  return ans;
 }
 
 
@@ -503,7 +503,7 @@ ADrep login_log_besselI_ad(ADrep logx, ADrep nu) {
   const ad* X1 = adptr(logx); const ad* X2 = adptr(nu);
   ad* Y = adptr(ans);
   for (int i=0; i<n; i++) Y[i] = login_log_besselI_(X1[i % n1], X2[i % n2]);
-  return as_advector(ans);
+  return ans;
 }
 
 TMB_BIND_ATOMIC(log_besselIx,
@@ -528,7 +528,7 @@ ADrep log_besselI_ad(ADrep x, ADrep nu) {
   const ad* X1 = adptr(x); const ad* X2 = adptr(nu);
   ad* Y = adptr(ans);
   for (int i=0; i<n; i++) Y[i] = log_besselI_(X1[i % n1], X2[i % n2]);
-  return as_advector(ans);
+  return ans;
 }
 
 
@@ -556,7 +556,7 @@ ADrep log_MarcumQ_ad(ADrep a, ADrep b, ADrep nu) {
   const ad* X1 = adptr(a); const ad* X2 = adptr(b); const ad* X3 = adptr(nu);
   ad* Y = adptr(ans);
   for (int i=0; i<n; i++) Y[i] = log_MarcumQ_(X1[i % n1], X2[i % n2], X3[i % n3]);
-  return as_advector(ans);
+  return ans;
 }
 
 
@@ -585,7 +585,7 @@ ADrep login_log_MarcumQ_ad(ADrep loga, ADrep logb, ADrep nu) {
   ad* Y = adptr(ans);
   for (int i=0; i<n; i++) Y[i] = login_log_MarcumQ_(X1[i % n1], X2[i % n2], X3[i % n3]);
   //for (int i=0; i<n; i++) Y[i] = pnchisq_(X2[i % n1], X3[i % n2], X1[i % n3],0,1);
-  return as_advector(ans);
+  return ans;
 }
 
 TMB_BIND_ATOMIC(log_Marcum1mQx,
@@ -613,7 +613,7 @@ ADrep log_Marcum1mQ_ad(ADrep a, ADrep b, ADrep nu) {
   ad* Y = adptr(ans);
   for (int i=0; i<n; i++) Y[i] = log_Marcum1mQ_(X1[i % n1], X2[i % n2], X3[i % n3]);
   //for (int i=0; i<n; i++) Y[i] = pnchisq_(X2[i % n1], X3[i % n2], X1[i % n3],1,1);
-  return as_advector(ans);
+  return ans;
 }
 
 
@@ -642,7 +642,7 @@ ADrep login_log_Marcum1mQ_ad(ADrep loga, ADrep logb, ADrep nu) {
   ad* Y = adptr(ans);
   for (int i=0; i<n; i++) Y[i] = login_log_Marcum1mQ_(X1[i % n1], X2[i % n2], X3[i % n3]);
   //for (int i=0; i<n; i++) Y[i] = pnchisq_(X2[i % n1], X3[i % n2], X1[i % n3],1,1);
-  return as_advector(ans);
+  return ans;
 }
 
 
@@ -670,7 +670,7 @@ ADrep logdrice_ad(ADrep logx, ADrep lognu, ADrep logsigma) {
   const ad* X1 = adptr(logx); const ad* X2 = adptr(lognu); const ad* X3 = adptr(logsigma);
   ad* Y = adptr(ans);
   for (int i=0; i<n; i++) Y[i] = logdrice_(X1[i % n1], X2[i % n2], X3[i % n3]);
-  return as_advector(ans);
+  return ans;
 }
 
 TMB_BIND_ATOMIC(lopricex,
@@ -698,5 +698,5 @@ ADrep logprice_ad(ADrep logx, ADrep lognu, ADrep logsigma, bool lower_tail) {
   const ad* X1 = adptr(logx); const ad* X2 = adptr(lognu); const ad* X3 = adptr(logsigma);
   ad* Y = adptr(ans);
   for (int i=0; i<n; i++) Y[i] = logprice_(X1[i % n1], X2[i % n2], X3[i % n3], lower_tail);
-  return as_advector(ans);
+  return ans;
 }
