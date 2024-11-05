@@ -3,7 +3,7 @@
 #include "RTMBconvenience_types.hpp"
 
 // [[Rcpp::export]]
-Rcpp::ComplexMatrix sparse_solve_ad(Rcpp::S4 &x, Rcpp::ComplexMatrix &y){
+ADrep sparse_solve_ad(Rcpp::S4 &x, ADrep &y){
 
   CHECK_INPUT(y);
   ConstMapMatrix Ey = MatrixInput(y);
@@ -35,7 +35,7 @@ void sparse_solve_ptr_update_ad(Rcpp::XPtr<Eigen::SparseLU< Eigen::SparseMatrix<
 
 
 // [[Rcpp::export]]
-Rcpp::ComplexMatrix sparse_solve_ptr_eval_ad(Rcpp::XPtr<Eigen::SparseLU< Eigen::SparseMatrix<ad>, Eigen::COLAMDOrdering<int> >> &ss, Rcpp::ComplexMatrix &y){
+ADrep sparse_solve_ptr_eval_ad(Rcpp::XPtr<Eigen::SparseLU< Eigen::SparseMatrix<ad>, Eigen::COLAMDOrdering<int> >> &ss, ADrep &y){
   CHECK_INPUT(y);
   ConstMapMatrix Ey = MatrixInput(y);
   matrix<ad> Ey_ad(Ey);

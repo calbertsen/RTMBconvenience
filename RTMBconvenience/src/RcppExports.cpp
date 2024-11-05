@@ -12,14 +12,14 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // pnchisq_ad
-Rcpp::ComplexVector pnchisq_ad(Rcpp::ComplexVector x, Rcpp::ComplexVector df, Rcpp::ComplexVector ncp, bool lower_tail, bool log_p);
+ADrep pnchisq_ad(ADrep x, ADrep df, ADrep ncp, bool lower_tail, bool log_p);
 RcppExport SEXP _RTMBconvenience_pnchisq_ad(SEXP xSEXP, SEXP dfSEXP, SEXP ncpSEXP, SEXP lower_tailSEXP, SEXP log_pSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::ComplexVector >::type x(xSEXP);
-    Rcpp::traits::input_parameter< Rcpp::ComplexVector >::type df(dfSEXP);
-    Rcpp::traits::input_parameter< Rcpp::ComplexVector >::type ncp(ncpSEXP);
+    Rcpp::traits::input_parameter< ADrep >::type x(xSEXP);
+    Rcpp::traits::input_parameter< ADrep >::type df(dfSEXP);
+    Rcpp::traits::input_parameter< ADrep >::type ncp(ncpSEXP);
     Rcpp::traits::input_parameter< bool >::type lower_tail(lower_tailSEXP);
     Rcpp::traits::input_parameter< bool >::type log_p(log_pSEXP);
     rcpp_result_gen = Rcpp::wrap(pnchisq_ad(x, df, ncp, lower_tail, log_p));
@@ -27,14 +27,14 @@ BEGIN_RCPP
 END_RCPP
 }
 // pnorm5_ad
-Rcpp::ComplexVector pnorm5_ad(Rcpp::ComplexVector x, Rcpp::ComplexVector mu, Rcpp::ComplexVector sigma, bool lower_tail, bool log_p);
+ADrep pnorm5_ad(ADrep x, ADrep mu, ADrep sigma, bool lower_tail, bool log_p);
 RcppExport SEXP _RTMBconvenience_pnorm5_ad(SEXP xSEXP, SEXP muSEXP, SEXP sigmaSEXP, SEXP lower_tailSEXP, SEXP log_pSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::ComplexVector >::type x(xSEXP);
-    Rcpp::traits::input_parameter< Rcpp::ComplexVector >::type mu(muSEXP);
-    Rcpp::traits::input_parameter< Rcpp::ComplexVector >::type sigma(sigmaSEXP);
+    Rcpp::traits::input_parameter< ADrep >::type x(xSEXP);
+    Rcpp::traits::input_parameter< ADrep >::type mu(muSEXP);
+    Rcpp::traits::input_parameter< ADrep >::type sigma(sigmaSEXP);
     Rcpp::traits::input_parameter< bool >::type lower_tail(lower_tailSEXP);
     Rcpp::traits::input_parameter< bool >::type log_p(log_pSEXP);
     rcpp_result_gen = Rcpp::wrap(pnorm5_ad(x, mu, sigma, lower_tail, log_p));
@@ -42,14 +42,14 @@ BEGIN_RCPP
 END_RCPP
 }
 // qnorm5_ad
-Rcpp::ComplexVector qnorm5_ad(Rcpp::ComplexVector x, Rcpp::ComplexVector mu, Rcpp::ComplexVector sigma, bool lower_tail, bool log_p);
+ADrep qnorm5_ad(ADrep x, ADrep mu, ADrep sigma, bool lower_tail, bool log_p);
 RcppExport SEXP _RTMBconvenience_qnorm5_ad(SEXP xSEXP, SEXP muSEXP, SEXP sigmaSEXP, SEXP lower_tailSEXP, SEXP log_pSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::ComplexVector >::type x(xSEXP);
-    Rcpp::traits::input_parameter< Rcpp::ComplexVector >::type mu(muSEXP);
-    Rcpp::traits::input_parameter< Rcpp::ComplexVector >::type sigma(sigmaSEXP);
+    Rcpp::traits::input_parameter< ADrep >::type x(xSEXP);
+    Rcpp::traits::input_parameter< ADrep >::type mu(muSEXP);
+    Rcpp::traits::input_parameter< ADrep >::type sigma(sigmaSEXP);
     Rcpp::traits::input_parameter< bool >::type lower_tail(lower_tailSEXP);
     Rcpp::traits::input_parameter< bool >::type log_p(log_pSEXP);
     rcpp_result_gen = Rcpp::wrap(qnorm5_ad(x, mu, sigma, lower_tail, log_p));
@@ -57,27 +57,27 @@ BEGIN_RCPP
 END_RCPP
 }
 // log_ipnorm_ad
-Rcpp::ComplexVector log_ipnorm_ad(Rcpp::ComplexVector x, Rcpp::ComplexVector y, Rcpp::ComplexVector mu, Rcpp::ComplexVector sigma);
+ADrep log_ipnorm_ad(ADrep x, ADrep y, ADrep mu, ADrep sigma);
 RcppExport SEXP _RTMBconvenience_log_ipnorm_ad(SEXP xSEXP, SEXP ySEXP, SEXP muSEXP, SEXP sigmaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::ComplexVector >::type x(xSEXP);
-    Rcpp::traits::input_parameter< Rcpp::ComplexVector >::type y(ySEXP);
-    Rcpp::traits::input_parameter< Rcpp::ComplexVector >::type mu(muSEXP);
-    Rcpp::traits::input_parameter< Rcpp::ComplexVector >::type sigma(sigmaSEXP);
+    Rcpp::traits::input_parameter< ADrep >::type x(xSEXP);
+    Rcpp::traits::input_parameter< ADrep >::type y(ySEXP);
+    Rcpp::traits::input_parameter< ADrep >::type mu(muSEXP);
+    Rcpp::traits::input_parameter< ADrep >::type sigma(sigmaSEXP);
     rcpp_result_gen = Rcpp::wrap(log_ipnorm_ad(x, y, mu, sigma));
     return rcpp_result_gen;
 END_RCPP
 }
 // pt_ad
-Rcpp::ComplexVector pt_ad(Rcpp::ComplexVector x, Rcpp::ComplexVector df, bool lower_tail, bool log_p);
+ADrep pt_ad(ADrep x, ADrep df, bool lower_tail, bool log_p);
 RcppExport SEXP _RTMBconvenience_pt_ad(SEXP xSEXP, SEXP dfSEXP, SEXP lower_tailSEXP, SEXP log_pSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::ComplexVector >::type x(xSEXP);
-    Rcpp::traits::input_parameter< Rcpp::ComplexVector >::type df(dfSEXP);
+    Rcpp::traits::input_parameter< ADrep >::type x(xSEXP);
+    Rcpp::traits::input_parameter< ADrep >::type df(dfSEXP);
     Rcpp::traits::input_parameter< bool >::type lower_tail(lower_tailSEXP);
     Rcpp::traits::input_parameter< bool >::type log_p(log_pSEXP);
     rcpp_result_gen = Rcpp::wrap(pt_ad(x, df, lower_tail, log_p));
@@ -85,13 +85,13 @@ BEGIN_RCPP
 END_RCPP
 }
 // qt_ad
-Rcpp::ComplexVector qt_ad(Rcpp::ComplexVector p, Rcpp::ComplexVector df, bool lower_tail, bool log_p);
+ADrep qt_ad(ADrep p, ADrep df, bool lower_tail, bool log_p);
 RcppExport SEXP _RTMBconvenience_qt_ad(SEXP pSEXP, SEXP dfSEXP, SEXP lower_tailSEXP, SEXP log_pSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::ComplexVector >::type p(pSEXP);
-    Rcpp::traits::input_parameter< Rcpp::ComplexVector >::type df(dfSEXP);
+    Rcpp::traits::input_parameter< ADrep >::type p(pSEXP);
+    Rcpp::traits::input_parameter< ADrep >::type df(dfSEXP);
     Rcpp::traits::input_parameter< bool >::type lower_tail(lower_tailSEXP);
     Rcpp::traits::input_parameter< bool >::type log_p(log_pSEXP);
     rcpp_result_gen = Rcpp::wrap(qt_ad(p, df, lower_tail, log_p));
@@ -99,174 +99,174 @@ BEGIN_RCPP
 END_RCPP
 }
 // pde_scheme_ad
-Rcpp::ComplexVector pde_scheme_ad(Rcpp::ComplexVector x);
+ADrep pde_scheme_ad(ADrep x);
 RcppExport SEXP _RTMBconvenience_pde_scheme_ad(SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::ComplexVector >::type x(xSEXP);
+    Rcpp::traits::input_parameter< ADrep >::type x(xSEXP);
     rcpp_result_gen = Rcpp::wrap(pde_scheme_ad(x));
     return rcpp_result_gen;
 END_RCPP
 }
 // logspace_add_ad
-Rcpp::ComplexVector logspace_add_ad(Rcpp::ComplexVector x, Rcpp::ComplexVector y);
+ADrep logspace_add_ad(ADrep x, ADrep y);
 RcppExport SEXP _RTMBconvenience_logspace_add_ad(SEXP xSEXP, SEXP ySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::ComplexVector >::type x(xSEXP);
-    Rcpp::traits::input_parameter< Rcpp::ComplexVector >::type y(ySEXP);
+    Rcpp::traits::input_parameter< ADrep >::type x(xSEXP);
+    Rcpp::traits::input_parameter< ADrep >::type y(ySEXP);
     rcpp_result_gen = Rcpp::wrap(logspace_add_ad(x, y));
     return rcpp_result_gen;
 END_RCPP
 }
 // logspace_sum_ad
-Rcpp::ComplexVector logspace_sum_ad(Rcpp::ComplexVector x);
+ADrep logspace_sum_ad(ADrep x);
 RcppExport SEXP _RTMBconvenience_logspace_sum_ad(SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::ComplexVector >::type x(xSEXP);
+    Rcpp::traits::input_parameter< ADrep >::type x(xSEXP);
     rcpp_result_gen = Rcpp::wrap(logspace_sum_ad(x));
     return rcpp_result_gen;
 END_RCPP
 }
 // logspace_sub_ad
-Rcpp::ComplexVector logspace_sub_ad(Rcpp::ComplexVector x, Rcpp::ComplexVector y);
+ADrep logspace_sub_ad(ADrep x, ADrep y);
 RcppExport SEXP _RTMBconvenience_logspace_sub_ad(SEXP xSEXP, SEXP ySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::ComplexVector >::type x(xSEXP);
-    Rcpp::traits::input_parameter< Rcpp::ComplexVector >::type y(ySEXP);
+    Rcpp::traits::input_parameter< ADrep >::type x(xSEXP);
+    Rcpp::traits::input_parameter< ADrep >::type y(ySEXP);
     rcpp_result_gen = Rcpp::wrap(logspace_sub_ad(x, y));
     return rcpp_result_gen;
 END_RCPP
 }
 // quantreg_ad
-Rcpp::ComplexVector quantreg_ad(Rcpp::ComplexVector x, Rcpp::ComplexVector tau);
+ADrep quantreg_ad(ADrep x, ADrep tau);
 RcppExport SEXP _RTMBconvenience_quantreg_ad(SEXP xSEXP, SEXP tauSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::ComplexVector >::type x(xSEXP);
-    Rcpp::traits::input_parameter< Rcpp::ComplexVector >::type tau(tauSEXP);
+    Rcpp::traits::input_parameter< ADrep >::type x(xSEXP);
+    Rcpp::traits::input_parameter< ADrep >::type tau(tauSEXP);
     rcpp_result_gen = Rcpp::wrap(quantreg_ad(x, tau));
     return rcpp_result_gen;
 END_RCPP
 }
 // login_log_besselI_ad
-Rcpp::ComplexVector login_log_besselI_ad(Rcpp::ComplexVector logx, Rcpp::ComplexVector nu);
+ADrep login_log_besselI_ad(ADrep logx, ADrep nu);
 RcppExport SEXP _RTMBconvenience_login_log_besselI_ad(SEXP logxSEXP, SEXP nuSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::ComplexVector >::type logx(logxSEXP);
-    Rcpp::traits::input_parameter< Rcpp::ComplexVector >::type nu(nuSEXP);
+    Rcpp::traits::input_parameter< ADrep >::type logx(logxSEXP);
+    Rcpp::traits::input_parameter< ADrep >::type nu(nuSEXP);
     rcpp_result_gen = Rcpp::wrap(login_log_besselI_ad(logx, nu));
     return rcpp_result_gen;
 END_RCPP
 }
 // log_besselI_ad
-Rcpp::ComplexVector log_besselI_ad(Rcpp::ComplexVector x, Rcpp::ComplexVector nu);
+ADrep log_besselI_ad(ADrep x, ADrep nu);
 RcppExport SEXP _RTMBconvenience_log_besselI_ad(SEXP xSEXP, SEXP nuSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::ComplexVector >::type x(xSEXP);
-    Rcpp::traits::input_parameter< Rcpp::ComplexVector >::type nu(nuSEXP);
+    Rcpp::traits::input_parameter< ADrep >::type x(xSEXP);
+    Rcpp::traits::input_parameter< ADrep >::type nu(nuSEXP);
     rcpp_result_gen = Rcpp::wrap(log_besselI_ad(x, nu));
     return rcpp_result_gen;
 END_RCPP
 }
 // log_MarcumQ_ad
-Rcpp::ComplexVector log_MarcumQ_ad(Rcpp::ComplexVector a, Rcpp::ComplexVector b, Rcpp::ComplexVector nu);
+ADrep log_MarcumQ_ad(ADrep a, ADrep b, ADrep nu);
 RcppExport SEXP _RTMBconvenience_log_MarcumQ_ad(SEXP aSEXP, SEXP bSEXP, SEXP nuSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::ComplexVector >::type a(aSEXP);
-    Rcpp::traits::input_parameter< Rcpp::ComplexVector >::type b(bSEXP);
-    Rcpp::traits::input_parameter< Rcpp::ComplexVector >::type nu(nuSEXP);
+    Rcpp::traits::input_parameter< ADrep >::type a(aSEXP);
+    Rcpp::traits::input_parameter< ADrep >::type b(bSEXP);
+    Rcpp::traits::input_parameter< ADrep >::type nu(nuSEXP);
     rcpp_result_gen = Rcpp::wrap(log_MarcumQ_ad(a, b, nu));
     return rcpp_result_gen;
 END_RCPP
 }
 // login_log_MarcumQ_ad
-Rcpp::ComplexVector login_log_MarcumQ_ad(Rcpp::ComplexVector loga, Rcpp::ComplexVector logb, Rcpp::ComplexVector nu);
+ADrep login_log_MarcumQ_ad(ADrep loga, ADrep logb, ADrep nu);
 RcppExport SEXP _RTMBconvenience_login_log_MarcumQ_ad(SEXP logaSEXP, SEXP logbSEXP, SEXP nuSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::ComplexVector >::type loga(logaSEXP);
-    Rcpp::traits::input_parameter< Rcpp::ComplexVector >::type logb(logbSEXP);
-    Rcpp::traits::input_parameter< Rcpp::ComplexVector >::type nu(nuSEXP);
+    Rcpp::traits::input_parameter< ADrep >::type loga(logaSEXP);
+    Rcpp::traits::input_parameter< ADrep >::type logb(logbSEXP);
+    Rcpp::traits::input_parameter< ADrep >::type nu(nuSEXP);
     rcpp_result_gen = Rcpp::wrap(login_log_MarcumQ_ad(loga, logb, nu));
     return rcpp_result_gen;
 END_RCPP
 }
 // log_Marcum1mQ_ad
-Rcpp::ComplexVector log_Marcum1mQ_ad(Rcpp::ComplexVector a, Rcpp::ComplexVector b, Rcpp::ComplexVector nu);
+ADrep log_Marcum1mQ_ad(ADrep a, ADrep b, ADrep nu);
 RcppExport SEXP _RTMBconvenience_log_Marcum1mQ_ad(SEXP aSEXP, SEXP bSEXP, SEXP nuSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::ComplexVector >::type a(aSEXP);
-    Rcpp::traits::input_parameter< Rcpp::ComplexVector >::type b(bSEXP);
-    Rcpp::traits::input_parameter< Rcpp::ComplexVector >::type nu(nuSEXP);
+    Rcpp::traits::input_parameter< ADrep >::type a(aSEXP);
+    Rcpp::traits::input_parameter< ADrep >::type b(bSEXP);
+    Rcpp::traits::input_parameter< ADrep >::type nu(nuSEXP);
     rcpp_result_gen = Rcpp::wrap(log_Marcum1mQ_ad(a, b, nu));
     return rcpp_result_gen;
 END_RCPP
 }
 // login_log_Marcum1mQ_ad
-Rcpp::ComplexVector login_log_Marcum1mQ_ad(Rcpp::ComplexVector loga, Rcpp::ComplexVector logb, Rcpp::ComplexVector nu);
+ADrep login_log_Marcum1mQ_ad(ADrep loga, ADrep logb, ADrep nu);
 RcppExport SEXP _RTMBconvenience_login_log_Marcum1mQ_ad(SEXP logaSEXP, SEXP logbSEXP, SEXP nuSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::ComplexVector >::type loga(logaSEXP);
-    Rcpp::traits::input_parameter< Rcpp::ComplexVector >::type logb(logbSEXP);
-    Rcpp::traits::input_parameter< Rcpp::ComplexVector >::type nu(nuSEXP);
+    Rcpp::traits::input_parameter< ADrep >::type loga(logaSEXP);
+    Rcpp::traits::input_parameter< ADrep >::type logb(logbSEXP);
+    Rcpp::traits::input_parameter< ADrep >::type nu(nuSEXP);
     rcpp_result_gen = Rcpp::wrap(login_log_Marcum1mQ_ad(loga, logb, nu));
     return rcpp_result_gen;
 END_RCPP
 }
 // logdrice_ad
-Rcpp::ComplexVector logdrice_ad(Rcpp::ComplexVector logx, Rcpp::ComplexVector lognu, Rcpp::ComplexVector logsigma);
+ADrep logdrice_ad(ADrep logx, ADrep lognu, ADrep logsigma);
 RcppExport SEXP _RTMBconvenience_logdrice_ad(SEXP logxSEXP, SEXP lognuSEXP, SEXP logsigmaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::ComplexVector >::type logx(logxSEXP);
-    Rcpp::traits::input_parameter< Rcpp::ComplexVector >::type lognu(lognuSEXP);
-    Rcpp::traits::input_parameter< Rcpp::ComplexVector >::type logsigma(logsigmaSEXP);
+    Rcpp::traits::input_parameter< ADrep >::type logx(logxSEXP);
+    Rcpp::traits::input_parameter< ADrep >::type lognu(lognuSEXP);
+    Rcpp::traits::input_parameter< ADrep >::type logsigma(logsigmaSEXP);
     rcpp_result_gen = Rcpp::wrap(logdrice_ad(logx, lognu, logsigma));
     return rcpp_result_gen;
 END_RCPP
 }
 // logprice_ad
-Rcpp::ComplexVector logprice_ad(Rcpp::ComplexVector logx, Rcpp::ComplexVector lognu, Rcpp::ComplexVector logsigma, bool lower_tail);
+ADrep logprice_ad(ADrep logx, ADrep lognu, ADrep logsigma, bool lower_tail);
 RcppExport SEXP _RTMBconvenience_logprice_ad(SEXP logxSEXP, SEXP lognuSEXP, SEXP logsigmaSEXP, SEXP lower_tailSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::ComplexVector >::type logx(logxSEXP);
-    Rcpp::traits::input_parameter< Rcpp::ComplexVector >::type lognu(lognuSEXP);
-    Rcpp::traits::input_parameter< Rcpp::ComplexVector >::type logsigma(logsigmaSEXP);
+    Rcpp::traits::input_parameter< ADrep >::type logx(logxSEXP);
+    Rcpp::traits::input_parameter< ADrep >::type lognu(lognuSEXP);
+    Rcpp::traits::input_parameter< ADrep >::type logsigma(logsigmaSEXP);
     Rcpp::traits::input_parameter< bool >::type lower_tail(lower_tailSEXP);
     rcpp_result_gen = Rcpp::wrap(logprice_ad(logx, lognu, logsigma, lower_tail));
     return rcpp_result_gen;
 END_RCPP
 }
 // sparse_solve_ad
-Rcpp::ComplexMatrix sparse_solve_ad(Rcpp::S4& x, Rcpp::ComplexMatrix& y);
+ADrep sparse_solve_ad(Rcpp::S4& x, ADrep& y);
 RcppExport SEXP _RTMBconvenience_sparse_solve_ad(SEXP xSEXP, SEXP ySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::S4& >::type x(xSEXP);
-    Rcpp::traits::input_parameter< Rcpp::ComplexMatrix& >::type y(ySEXP);
+    Rcpp::traits::input_parameter< ADrep& >::type y(ySEXP);
     rcpp_result_gen = Rcpp::wrap(sparse_solve_ad(x, y));
     return rcpp_result_gen;
 END_RCPP
@@ -294,13 +294,13 @@ BEGIN_RCPP
 END_RCPP
 }
 // sparse_solve_ptr_eval_ad
-Rcpp::ComplexMatrix sparse_solve_ptr_eval_ad(Rcpp::XPtr<Eigen::SparseLU< Eigen::SparseMatrix<ad>, Eigen::COLAMDOrdering<int> >>& ss, Rcpp::ComplexMatrix& y);
+ADrep sparse_solve_ptr_eval_ad(Rcpp::XPtr<Eigen::SparseLU< Eigen::SparseMatrix<ad>, Eigen::COLAMDOrdering<int> >>& ss, ADrep& y);
 RcppExport SEXP _RTMBconvenience_sparse_solve_ptr_eval_ad(SEXP ssSEXP, SEXP ySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::XPtr<Eigen::SparseLU< Eigen::SparseMatrix<ad>, Eigen::COLAMDOrdering<int> >>& >::type ss(ssSEXP);
-    Rcpp::traits::input_parameter< Rcpp::ComplexMatrix& >::type y(ySEXP);
+    Rcpp::traits::input_parameter< ADrep& >::type y(ySEXP);
     rcpp_result_gen = Rcpp::wrap(sparse_solve_ptr_eval_ad(ss, y));
     return rcpp_result_gen;
 END_RCPP

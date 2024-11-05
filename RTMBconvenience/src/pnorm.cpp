@@ -204,7 +204,7 @@ Type pnchisq_(Type x, Type df, Type ncp, int lower_tail, int log_p){
 }
 
 // [[Rcpp::export]]
-Rcpp::ComplexVector pnchisq_ad(Rcpp::ComplexVector x, Rcpp::ComplexVector df, Rcpp::ComplexVector ncp, bool lower_tail, bool log_p ) {
+ADrep pnchisq_ad(ADrep x, ADrep df, ADrep ncp, bool lower_tail, bool log_p ) {
   CHECK_INPUT(x); CHECK_INPUT(df); CHECK_INPUT(ncp);
   size_t n1 = x.size();
   size_t n2 = df.size();
@@ -212,7 +212,7 @@ Rcpp::ComplexVector pnchisq_ad(Rcpp::ComplexVector x, Rcpp::ComplexVector df, Rc
   int nmax = std::max({n1, n2, n3});
   int nmin = std::min({n1, n2, n3});
   int n = (nmin == 0 ? 0 : nmax);
-  Rcpp::ComplexVector ans(n);
+  ADrep ans(n);
   const ad* X1 = adptr(x); const ad* X2 = adptr(df); const ad* X3 = adptr(ncp);
   ad* Y = adptr(ans);
   for (int i=0; i<n; i++) Y[i] = pnchisq_(X1[i % n1], X2[i % n2], X3[i % n3], lower_tail, log_p);
@@ -236,7 +236,7 @@ Type pnorm5_(Type x, Type mu, Type sigma, int lower_tail, int log_p){
 }
 
 // [[Rcpp::export]]
-Rcpp::ComplexVector pnorm5_ad(Rcpp::ComplexVector x, Rcpp::ComplexVector mu, Rcpp::ComplexVector sigma, bool lower_tail, bool log_p ) {
+ADrep pnorm5_ad(ADrep x, ADrep mu, ADrep sigma, bool lower_tail, bool log_p ) {
   CHECK_INPUT(x); CHECK_INPUT(mu); CHECK_INPUT(sigma);
   size_t n1 = x.size();
   size_t n2 = mu.size();
@@ -244,7 +244,7 @@ Rcpp::ComplexVector pnorm5_ad(Rcpp::ComplexVector x, Rcpp::ComplexVector mu, Rcp
   int nmax = std::max({n1, n2, n3});
   int nmin = std::min({n1, n2, n3});
   int n = (nmin == 0 ? 0 : nmax);
-  Rcpp::ComplexVector ans(n);
+  ADrep ans(n);
   const ad* X1 = adptr(x); const ad* X2 = adptr(mu); const ad* X3 = adptr(sigma);
   ad* Y = adptr(ans);
   for (int i=0; i<n; i++) Y[i] = pnorm5_(X1[i % n1], X2[i % n2], X3[i % n3], lower_tail, log_p);
@@ -267,7 +267,7 @@ Type qnorm5_(Type x, Type mu, Type sigma, int lower_tail, int log_p){
 }
 
 // [[Rcpp::export]]
-Rcpp::ComplexVector qnorm5_ad(Rcpp::ComplexVector x, Rcpp::ComplexVector mu, Rcpp::ComplexVector sigma, bool lower_tail, bool log_p ) {
+ADrep qnorm5_ad(ADrep x, ADrep mu, ADrep sigma, bool lower_tail, bool log_p ) {
   CHECK_INPUT(x); CHECK_INPUT(mu); CHECK_INPUT(sigma);
   size_t n1 = x.size();
   size_t n2 = mu.size();
@@ -275,7 +275,7 @@ Rcpp::ComplexVector qnorm5_ad(Rcpp::ComplexVector x, Rcpp::ComplexVector mu, Rcp
   int nmax = std::max({n1, n2, n3});
   int nmin = std::min({n1, n2, n3});
   int n = (nmin == 0 ? 0 : nmax);
-  Rcpp::ComplexVector ans(n);
+  ADrep ans(n);
   const ad* X1 = adptr(x); const ad* X2 = adptr(mu); const ad* X3 = adptr(sigma);
   ad* Y = adptr(ans);
   for (int i=0; i<n; i++) Y[i] = qnorm5_(X1[i % n1], X2[i % n2], X3[i % n3], lower_tail, log_p);
@@ -297,7 +297,7 @@ Type log_ipnorm_(Type x, Type y, Type mu, Type sigma){
 }
 
 // [[Rcpp::export]]
-Rcpp::ComplexVector log_ipnorm_ad(Rcpp::ComplexVector x, Rcpp::ComplexVector y, Rcpp::ComplexVector mu, Rcpp::ComplexVector sigma) {
+ADrep log_ipnorm_ad(ADrep x, ADrep y, ADrep mu, ADrep sigma) {
   CHECK_INPUT(x); CHECK_INPUT(y); CHECK_INPUT(sigma); 
   size_t n1 = x.size();
   size_t n2 = y.size();
@@ -306,7 +306,7 @@ Rcpp::ComplexVector log_ipnorm_ad(Rcpp::ComplexVector x, Rcpp::ComplexVector y, 
   int nmax = std::max({n1, n2, n3, n4});
   int nmin = std::min({n1, n2, n3, n4});
   int n = (nmin == 0 ? 0 : nmax);
-  Rcpp::ComplexVector ans(n);
+  ADrep ans(n);
   const ad* X1 = adptr(x); const ad* X2 = adptr(y); const ad* X3 = adptr(mu); const ad* X4 = adptr(sigma);
   ad* Y = adptr(ans);
   for (int i=0; i<n; i++) Y[i] = log_ipnorm_(X1[i % n1], X2[i % n2], X3[i % n3], X4[i % n4]);
@@ -329,14 +329,14 @@ TMB_BIND_ATOMIC(pt_at,1100,adaptive::pt_raw(x[0], x[1], x[2], x[3]))
   }
 
 // [[Rcpp::export]]
-Rcpp::ComplexVector pt_ad(Rcpp::ComplexVector x, Rcpp::ComplexVector df, bool lower_tail, bool log_p ) {
+ADrep pt_ad(ADrep x, ADrep df, bool lower_tail, bool log_p ) {
   CHECK_INPUT(x); CHECK_INPUT(df); 
   size_t n1 = x.size();
   size_t n2 = df.size();
   int nmax = std::max({n1, n2});
   int nmin = std::min({n1, n2});
   int n = (nmin == 0 ? 0 : nmax);
-  Rcpp::ComplexVector ans(n);
+  ADrep ans(n);
   const ad* X1 = adptr(x); const ad* X2 = adptr(df);
   ad* Y = adptr(ans);
   for (int i=0; i<n; i++) Y[i] = pt_(X1[i % n1], X2[i % n2], lower_tail, log_p);
@@ -360,14 +360,14 @@ TMB_BIND_ATOMIC(qt_at,1100,adaptive::qt_raw(x[0], x[1], x[2], x[3]))
   }
 
 // [[Rcpp::export]]
-Rcpp::ComplexVector qt_ad(Rcpp::ComplexVector p, Rcpp::ComplexVector df, bool lower_tail, bool log_p ) {
+ADrep qt_ad(ADrep p, ADrep df, bool lower_tail, bool log_p ) {
   CHECK_INPUT(p); CHECK_INPUT(df); 
   size_t n1 = p.size();
   size_t n2 = df.size();
   int nmax = std::max({n1, n2});
   int nmin = std::min({n1, n2});
   int n = (nmin == 0 ? 0 : nmax);
-  Rcpp::ComplexVector ans(n);
+  ADrep ans(n);
   const ad* X1 = adptr(p); const ad* X2 = adptr(df);
   ad* Y = adptr(ans);
   for (int i=0; i<n; i++) Y[i] = qt_(X1[i % n1], X2[i % n2], lower_tail, log_p);
@@ -387,10 +387,10 @@ Type ps_(Type x) {
 }
 
 // [[Rcpp::export]]
-Rcpp::ComplexVector pde_scheme_ad(Rcpp::ComplexVector x) {
+ADrep pde_scheme_ad(ADrep x) {
   CHECK_INPUT(x); 
   int n = x.size();
-  Rcpp::ComplexVector ans(n);
+  ADrep ans(n);
   const ad* X1 = adptr(x);
   ad* Y = adptr(ans);
   for (int i=0; i<n; i++) Y[i] = ps_(X1[i]);
@@ -412,14 +412,14 @@ Type logspace_add2(Type logx, Type logy) {
 }
 
 // [[Rcpp::export]]
-Rcpp::ComplexVector logspace_add_ad(Rcpp::ComplexVector x, Rcpp::ComplexVector y) {
+ADrep logspace_add_ad(ADrep x, ADrep y) {
   CHECK_INPUT(x); CHECK_INPUT(y); 
   size_t n1 = x.size();
   size_t n2 = y.size();
   int nmax = std::max({n1, n2});
   int nmin = std::min({n1, n2});
   int n = (nmin == 0 ? 0 : nmax);
-  Rcpp::ComplexVector ans(n);
+  ADrep ans(n);
   const ad* X1 = adptr(x); const ad* X2 = adptr(y);
   ad* Y = adptr(ans);
   for (int i=0; i<n; i++) Y[i] = logspace_add2(X1[i % n1], X2[i % n2]);
@@ -427,10 +427,10 @@ Rcpp::ComplexVector logspace_add_ad(Rcpp::ComplexVector x, Rcpp::ComplexVector y
 }
 
 // [[Rcpp::export]]
-Rcpp::ComplexVector logspace_sum_ad(Rcpp::ComplexVector x) {
+ADrep logspace_sum_ad(ADrep x) {
   CHECK_INPUT(x); 
   int n = x.size();
-  Rcpp::ComplexVector ans(1);  
+  ADrep ans(1);  
   const ad* X1 = adptr(x);
   ad* Y = adptr(ans);
   Y[0] = X1[0];
@@ -452,14 +452,14 @@ Type logspace_sub2(Type logx, Type logy) {
   return logspace_sub2x(CppAD::vector<Type>(tx))[0];
 }
 // [[Rcpp::export]]
-Rcpp::ComplexVector logspace_sub_ad(Rcpp::ComplexVector x, Rcpp::ComplexVector y) {
+ADrep logspace_sub_ad(ADrep x, ADrep y) {
   CHECK_INPUT(x); CHECK_INPUT(y); 
   size_t n1 = x.size();
   size_t n2 = y.size();
   int nmax = std::max({n1, n2});
   int nmin = std::min({n1, n2});
   int n = (nmin == 0 ? 0 : nmax);
-  Rcpp::ComplexVector ans(n);
+  ADrep ans(n);
   const ad* X1 = adptr(x); const ad* X2 = adptr(y);
   ad* Y = adptr(ans);
   for (int i=0; i<n; i++) Y[i] = logspace_sub2(X1[i % n1], X2[i % n2]);
@@ -477,14 +477,14 @@ Rcpp::ComplexVector logspace_sub_ad(Rcpp::ComplexVector x, Rcpp::ComplexVector y
     return quantreg_x(CppAD::vector<Type>(tx))[0];
   }
 // [[Rcpp::export]]
-Rcpp::ComplexVector quantreg_ad(Rcpp::ComplexVector x, Rcpp::ComplexVector tau) {
+ADrep quantreg_ad(ADrep x, ADrep tau) {
   CHECK_INPUT(x); CHECK_INPUT(tau); 
   size_t n1 = x.size();
   size_t n2 = tau.size();
   int nmax = std::max({n1, n2});
   int nmin = std::min({n1, n2});
   int n = (nmin == 0 ? 0 : nmax);
-  Rcpp::ComplexVector ans(n);
+  ADrep ans(n);
   const ad* X1 = adptr(x); const ad* X2 = adptr(tau);
   ad* Y = adptr(ans);
   for (int i=0; i<n; i++) Y[i] = quantreg_(X1[i % n1], X2[i % n2]);
@@ -504,14 +504,14 @@ Type login_log_besselI_(Type logx, Type nu) {
   return login_log_besselIx(CppAD::vector<Type>(tx))[0];
 }
 // [[Rcpp::export]]
-Rcpp::ComplexVector login_log_besselI_ad(Rcpp::ComplexVector logx, Rcpp::ComplexVector nu) {
+ADrep login_log_besselI_ad(ADrep logx, ADrep nu) {
   CHECK_INPUT(logx); CHECK_INPUT(nu); 
   size_t n1 = logx.size();
   size_t n2 = nu.size();
   int nmax = std::max({n1, n2});
   int nmin = std::min({n1, n2});
   int n = (nmin == 0 ? 0 : nmax);
-  Rcpp::ComplexVector ans(n);
+  ADrep ans(n);
   const ad* X1 = adptr(logx); const ad* X2 = adptr(nu);
   ad* Y = adptr(ans);
   for (int i=0; i<n; i++) Y[i] = login_log_besselI_(X1[i % n1], X2[i % n2]);
@@ -530,14 +530,14 @@ Type log_besselI_(Type x, Type nu) {
   return log_besselIx(CppAD::vector<Type>(tx))[0];
 }
 // [[Rcpp::export]]
-Rcpp::ComplexVector log_besselI_ad(Rcpp::ComplexVector x, Rcpp::ComplexVector nu) {
+ADrep log_besselI_ad(ADrep x, ADrep nu) {
   CHECK_INPUT(x); CHECK_INPUT(nu); 
   size_t n1 = x.size();
   size_t n2 = nu.size();
   int nmax = std::max({n1, n2});
   int nmin = std::min({n1, n2});
   int n = (nmin == 0 ? 0 : nmax);
-  Rcpp::ComplexVector ans(n);
+  ADrep ans(n);
   const ad* X1 = adptr(x); const ad* X2 = adptr(nu);
   ad* Y = adptr(ans);
   for (int i=0; i<n; i++) Y[i] = log_besselI_(X1[i % n1], X2[i % n2]);
@@ -558,7 +558,7 @@ Type log_MarcumQ_(Type a, Type b, Type nu) {
   return log_MarcumQx(CppAD::vector<Type>(tx))[0];
 }
 // [[Rcpp::export]]
-Rcpp::ComplexVector log_MarcumQ_ad(Rcpp::ComplexVector a, Rcpp::ComplexVector b, Rcpp::ComplexVector nu) {
+ADrep log_MarcumQ_ad(ADrep a, ADrep b, ADrep nu) {
   CHECK_INPUT(a); CHECK_INPUT(b); CHECK_INPUT(nu); 
   size_t n1 = a.size();
   size_t n2 = b.size();
@@ -566,7 +566,7 @@ Rcpp::ComplexVector log_MarcumQ_ad(Rcpp::ComplexVector a, Rcpp::ComplexVector b,
   int nmax = std::max({n1, n2, n3});
   int nmin = std::min({n1, n2, n3});
   int n = (nmin == 0 ? 0 : nmax);
-  Rcpp::ComplexVector ans(n);
+  ADrep ans(n);
   const ad* X1 = adptr(a); const ad* X2 = adptr(b); const ad* X3 = adptr(nu);
   ad* Y = adptr(ans);
   for (int i=0; i<n; i++) Y[i] = log_MarcumQ_(X1[i % n1], X2[i % n2], X3[i % n3]);
@@ -587,7 +587,7 @@ Type login_log_MarcumQ_(Type loga, Type logb, Type nu) {
   return login_log_MarcumQx(CppAD::vector<Type>(tx))[0];
 }
 // [[Rcpp::export]]
-Rcpp::ComplexVector login_log_MarcumQ_ad(Rcpp::ComplexVector loga, Rcpp::ComplexVector logb, Rcpp::ComplexVector nu) {
+ADrep login_log_MarcumQ_ad(ADrep loga, ADrep logb, ADrep nu) {
   CHECK_INPUT(loga); CHECK_INPUT(logb); CHECK_INPUT(nu); 
   size_t n1 = loga.size();
   size_t n2 = logb.size();
@@ -595,7 +595,7 @@ Rcpp::ComplexVector login_log_MarcumQ_ad(Rcpp::ComplexVector loga, Rcpp::Complex
   int nmax = std::max({n1, n2, n3});
   int nmin = std::min({n1, n2, n3});
   int n = (nmin == 0 ? 0 : nmax);
-  Rcpp::ComplexVector ans(n);
+  ADrep ans(n);
   const ad* X1 = adptr(loga); const ad* X2 = adptr(logb); const ad* X3 = adptr(nu);
   ad* Y = adptr(ans);
   for (int i=0; i<n; i++) Y[i] = login_log_MarcumQ_(X1[i % n1], X2[i % n2], X3[i % n3]);
@@ -616,7 +616,7 @@ Type log_Marcum1mQ_(Type a, Type b, Type nu) {
   return log_Marcum1mQx(CppAD::vector<Type>(tx))[0];
 }
 // [[Rcpp::export]]
-Rcpp::ComplexVector log_Marcum1mQ_ad(Rcpp::ComplexVector a, Rcpp::ComplexVector b, Rcpp::ComplexVector nu) {
+ADrep log_Marcum1mQ_ad(ADrep a, ADrep b, ADrep nu) {
   CHECK_INPUT(a); CHECK_INPUT(b); CHECK_INPUT(nu); 
   size_t n1 = a.size();
   size_t n2 = b.size();
@@ -624,7 +624,7 @@ Rcpp::ComplexVector log_Marcum1mQ_ad(Rcpp::ComplexVector a, Rcpp::ComplexVector 
   int nmax = std::max({n1, n2, n3});
   int nmin = std::min({n1, n2, n3});
   int n = (nmin == 0 ? 0 : nmax);
-  Rcpp::ComplexVector ans(n);
+  ADrep ans(n);
   const ad* X1 = adptr(a); const ad* X2 = adptr(b); const ad* X3 = adptr(nu);
   ad* Y = adptr(ans);
   for (int i=0; i<n; i++) Y[i] = log_Marcum1mQ_(X1[i % n1], X2[i % n2], X3[i % n3]);
@@ -646,7 +646,7 @@ Type login_log_Marcum1mQ_(Type loga, Type logb, Type nu) {
   return login_log_Marcum1mQx(CppAD::vector<Type>(tx))[0];
 }
 // [[Rcpp::export]]
-Rcpp::ComplexVector login_log_Marcum1mQ_ad(Rcpp::ComplexVector loga, Rcpp::ComplexVector logb, Rcpp::ComplexVector nu) {
+ADrep login_log_Marcum1mQ_ad(ADrep loga, ADrep logb, ADrep nu) {
   CHECK_INPUT(loga); CHECK_INPUT(logb); CHECK_INPUT(nu); 
   size_t n1 = loga.size();
   size_t n2 = logb.size();
@@ -654,7 +654,7 @@ Rcpp::ComplexVector login_log_Marcum1mQ_ad(Rcpp::ComplexVector loga, Rcpp::Compl
   int nmax = std::max({n1, n2, n3});
   int nmin = std::min({n1, n2, n3});
   int n = (nmin == 0 ? 0 : nmax);
-  Rcpp::ComplexVector ans(n);
+  ADrep ans(n);
   const ad* X1 = adptr(loga); const ad* X2 = adptr(logb); const ad* X3 = adptr(nu);
   ad* Y = adptr(ans);
   for (int i=0; i<n; i++) Y[i] = login_log_Marcum1mQ_(X1[i % n1], X2[i % n2], X3[i % n3]);
@@ -676,7 +676,7 @@ Type logdrice_(Type logx, Type lognu, Type logsigma) {
   return lodricex(CppAD::vector<Type>(tx))[0];
 }
 // [[Rcpp::export]]
-Rcpp::ComplexVector logdrice_ad(Rcpp::ComplexVector logx, Rcpp::ComplexVector lognu, Rcpp::ComplexVector logsigma) {
+ADrep logdrice_ad(ADrep logx, ADrep lognu, ADrep logsigma) {
   CHECK_INPUT(logx); CHECK_INPUT(lognu); CHECK_INPUT(logsigma); 
   size_t n1 = logx.size();
   size_t n2 = lognu.size();
@@ -684,7 +684,7 @@ Rcpp::ComplexVector logdrice_ad(Rcpp::ComplexVector logx, Rcpp::ComplexVector lo
   int nmax = std::max({n1, n2, n3});
   int nmin = std::min({n1, n2, n3});
   int n = (nmin == 0 ? 0 : nmax);
-  Rcpp::ComplexVector ans(n);
+  ADrep ans(n);
   const ad* X1 = adptr(logx); const ad* X2 = adptr(lognu); const ad* X3 = adptr(logsigma);
   ad* Y = adptr(ans);
   for (int i=0; i<n; i++) Y[i] = logdrice_(X1[i % n1], X2[i % n2], X3[i % n3]);
@@ -705,7 +705,7 @@ Type logprice_(Type logx, Type lognu, Type logsigma, int lower_tail) {
   return lopricex(CppAD::vector<Type>(tx))[0];
 }
 // [[Rcpp::export]]
-Rcpp::ComplexVector logprice_ad(Rcpp::ComplexVector logx, Rcpp::ComplexVector lognu, Rcpp::ComplexVector logsigma, bool lower_tail) {
+ADrep logprice_ad(ADrep logx, ADrep lognu, ADrep logsigma, bool lower_tail) {
   CHECK_INPUT(logx); CHECK_INPUT(lognu); CHECK_INPUT(logsigma); 
   size_t n1 = logx.size();
   size_t n2 = lognu.size();
@@ -713,7 +713,7 @@ Rcpp::ComplexVector logprice_ad(Rcpp::ComplexVector logx, Rcpp::ComplexVector lo
   int nmax = std::max({n1, n2, n3});
   int nmin = std::min({n1, n2, n3});
   int n = (nmin == 0 ? 0 : nmax);
-  Rcpp::ComplexVector ans(n);
+  ADrep ans(n);
   const ad* X1 = adptr(logx); const ad* X2 = adptr(lognu); const ad* X3 = adptr(logsigma);
   ad* Y = adptr(ans);
   for (int i=0; i<n; i++) Y[i] = logprice_(X1[i % n1], X2[i % n2], X3[i % n3], lower_tail);
