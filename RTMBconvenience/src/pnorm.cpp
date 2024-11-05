@@ -205,7 +205,6 @@ Type pnchisq_(Type x, Type df, Type ncp, int lower_tail, int log_p){
 
 // [[Rcpp::export]]
 ADrep pnchisq_ad(ADrep x, ADrep df, ADrep ncp, bool lower_tail, bool log_p ) {
-  CHECK_INPUT(x); CHECK_INPUT(df); CHECK_INPUT(ncp);
   size_t n1 = x.size();
   size_t n2 = df.size();
   size_t n3 = ncp.size();
@@ -237,7 +236,6 @@ Type pnorm5_(Type x, Type mu, Type sigma, int lower_tail, int log_p){
 
 // [[Rcpp::export]]
 ADrep pnorm5_ad(ADrep x, ADrep mu, ADrep sigma, bool lower_tail, bool log_p ) {
-  CHECK_INPUT(x); CHECK_INPUT(mu); CHECK_INPUT(sigma);
   size_t n1 = x.size();
   size_t n2 = mu.size();
   size_t n3 = sigma.size();
@@ -268,7 +266,6 @@ Type qnorm5_(Type x, Type mu, Type sigma, int lower_tail, int log_p){
 
 // [[Rcpp::export]]
 ADrep qnorm5_ad(ADrep x, ADrep mu, ADrep sigma, bool lower_tail, bool log_p ) {
-  CHECK_INPUT(x); CHECK_INPUT(mu); CHECK_INPUT(sigma);
   size_t n1 = x.size();
   size_t n2 = mu.size();
   size_t n3 = sigma.size();
@@ -298,7 +295,6 @@ Type log_ipnorm_(Type x, Type y, Type mu, Type sigma){
 
 // [[Rcpp::export]]
 ADrep log_ipnorm_ad(ADrep x, ADrep y, ADrep mu, ADrep sigma) {
-  CHECK_INPUT(x); CHECK_INPUT(y); CHECK_INPUT(sigma); 
   size_t n1 = x.size();
   size_t n2 = y.size();
   size_t n3 = mu.size();
@@ -330,7 +326,6 @@ TMB_BIND_ATOMIC(pt_at,1100,adaptive::pt_raw(x[0], x[1], x[2], x[3]))
 
 // [[Rcpp::export]]
 ADrep pt_ad(ADrep x, ADrep df, bool lower_tail, bool log_p ) {
-  CHECK_INPUT(x); CHECK_INPUT(df); 
   size_t n1 = x.size();
   size_t n2 = df.size();
   int nmax = std::max({n1, n2});
@@ -361,7 +356,6 @@ TMB_BIND_ATOMIC(qt_at,1100,adaptive::qt_raw(x[0], x[1], x[2], x[3]))
 
 // [[Rcpp::export]]
 ADrep qt_ad(ADrep p, ADrep df, bool lower_tail, bool log_p ) {
-  CHECK_INPUT(p); CHECK_INPUT(df); 
   size_t n1 = p.size();
   size_t n2 = df.size();
   int nmax = std::max({n1, n2});
@@ -388,7 +382,6 @@ Type ps_(Type x) {
 
 // [[Rcpp::export]]
 ADrep pde_scheme_ad(ADrep x) {
-  CHECK_INPUT(x); 
   int n = x.size();
   ADrep ans(n);
   const ad* X1 = adptr(x);
@@ -413,7 +406,6 @@ Type logspace_add2(Type logx, Type logy) {
 
 // [[Rcpp::export]]
 ADrep logspace_add_ad(ADrep x, ADrep y) {
-  CHECK_INPUT(x); CHECK_INPUT(y); 
   size_t n1 = x.size();
   size_t n2 = y.size();
   int nmax = std::max({n1, n2});
@@ -428,7 +420,6 @@ ADrep logspace_add_ad(ADrep x, ADrep y) {
 
 // [[Rcpp::export]]
 ADrep logspace_sum_ad(ADrep x) {
-  CHECK_INPUT(x); 
   int n = x.size();
   ADrep ans(1);  
   const ad* X1 = adptr(x);
@@ -453,7 +444,6 @@ Type logspace_sub2(Type logx, Type logy) {
 }
 // [[Rcpp::export]]
 ADrep logspace_sub_ad(ADrep x, ADrep y) {
-  CHECK_INPUT(x); CHECK_INPUT(y); 
   size_t n1 = x.size();
   size_t n2 = y.size();
   int nmax = std::max({n1, n2});
@@ -478,7 +468,6 @@ ADrep logspace_sub_ad(ADrep x, ADrep y) {
   }
 // [[Rcpp::export]]
 ADrep quantreg_ad(ADrep x, ADrep tau) {
-  CHECK_INPUT(x); CHECK_INPUT(tau); 
   size_t n1 = x.size();
   size_t n2 = tau.size();
   int nmax = std::max({n1, n2});
@@ -505,7 +494,6 @@ Type login_log_besselI_(Type logx, Type nu) {
 }
 // [[Rcpp::export]]
 ADrep login_log_besselI_ad(ADrep logx, ADrep nu) {
-  CHECK_INPUT(logx); CHECK_INPUT(nu); 
   size_t n1 = logx.size();
   size_t n2 = nu.size();
   int nmax = std::max({n1, n2});
@@ -531,7 +519,6 @@ Type log_besselI_(Type x, Type nu) {
 }
 // [[Rcpp::export]]
 ADrep log_besselI_ad(ADrep x, ADrep nu) {
-  CHECK_INPUT(x); CHECK_INPUT(nu); 
   size_t n1 = x.size();
   size_t n2 = nu.size();
   int nmax = std::max({n1, n2});
@@ -559,7 +546,6 @@ Type log_MarcumQ_(Type a, Type b, Type nu) {
 }
 // [[Rcpp::export]]
 ADrep log_MarcumQ_ad(ADrep a, ADrep b, ADrep nu) {
-  CHECK_INPUT(a); CHECK_INPUT(b); CHECK_INPUT(nu); 
   size_t n1 = a.size();
   size_t n2 = b.size();
   size_t n3 = nu.size();
@@ -588,7 +574,6 @@ Type login_log_MarcumQ_(Type loga, Type logb, Type nu) {
 }
 // [[Rcpp::export]]
 ADrep login_log_MarcumQ_ad(ADrep loga, ADrep logb, ADrep nu) {
-  CHECK_INPUT(loga); CHECK_INPUT(logb); CHECK_INPUT(nu); 
   size_t n1 = loga.size();
   size_t n2 = logb.size();
   size_t n3 = nu.size();
@@ -617,7 +602,6 @@ Type log_Marcum1mQ_(Type a, Type b, Type nu) {
 }
 // [[Rcpp::export]]
 ADrep log_Marcum1mQ_ad(ADrep a, ADrep b, ADrep nu) {
-  CHECK_INPUT(a); CHECK_INPUT(b); CHECK_INPUT(nu); 
   size_t n1 = a.size();
   size_t n2 = b.size();
   size_t n3 = nu.size();
@@ -647,7 +631,6 @@ Type login_log_Marcum1mQ_(Type loga, Type logb, Type nu) {
 }
 // [[Rcpp::export]]
 ADrep login_log_Marcum1mQ_ad(ADrep loga, ADrep logb, ADrep nu) {
-  CHECK_INPUT(loga); CHECK_INPUT(logb); CHECK_INPUT(nu); 
   size_t n1 = loga.size();
   size_t n2 = logb.size();
   size_t n3 = nu.size();
@@ -677,7 +660,6 @@ Type logdrice_(Type logx, Type lognu, Type logsigma) {
 }
 // [[Rcpp::export]]
 ADrep logdrice_ad(ADrep logx, ADrep lognu, ADrep logsigma) {
-  CHECK_INPUT(logx); CHECK_INPUT(lognu); CHECK_INPUT(logsigma); 
   size_t n1 = logx.size();
   size_t n2 = lognu.size();
   size_t n3 = logsigma.size();
@@ -706,7 +688,6 @@ Type logprice_(Type logx, Type lognu, Type logsigma, int lower_tail) {
 }
 // [[Rcpp::export]]
 ADrep logprice_ad(ADrep logx, ADrep lognu, ADrep logsigma, bool lower_tail) {
-  CHECK_INPUT(logx); CHECK_INPUT(lognu); CHECK_INPUT(logsigma); 
   size_t n1 = logx.size();
   size_t n2 = lognu.size();
   size_t n3 = logsigma.size();

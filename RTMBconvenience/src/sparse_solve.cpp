@@ -5,7 +5,6 @@
 // [[Rcpp::export]]
 ADrep sparse_solve_ad(Rcpp::S4 &x, ADrep &y){
 
-  CHECK_INPUT(y);
   ConstMapMatrix Ey = MatrixInput(y);
   Eigen::SparseMatrix<ad> Ex = SparseInput(x);
   Eigen::SparseLU< Eigen::SparseMatrix<ad>, Eigen::COLAMDOrdering<int> > solver;
@@ -36,7 +35,6 @@ void sparse_solve_ptr_update_ad(Rcpp::XPtr<Eigen::SparseLU< Eigen::SparseMatrix<
 
 // [[Rcpp::export]]
 ADrep sparse_solve_ptr_eval_ad(Rcpp::XPtr<Eigen::SparseLU< Eigen::SparseMatrix<ad>, Eigen::COLAMDOrdering<int> >> &ss, ADrep &y){
-  CHECK_INPUT(y);
   ConstMapMatrix Ey = MatrixInput(y);
   matrix<ad> Ey_ad(Ey);
   matrix<ad> r = ss->solve(Ey_ad);
