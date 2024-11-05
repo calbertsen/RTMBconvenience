@@ -3,6 +3,7 @@
 
 #include "RTMBconvenience_types.hpp"
 #include <Rcpp.h>
+#include <RTMB.h>
 
 using namespace Rcpp;
 
