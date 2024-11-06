@@ -1,0 +1,3 @@
+#!/bin/sh
+
+rm -rf config.log config.status src/RcppExports.cpp src/*.o src/*.so
