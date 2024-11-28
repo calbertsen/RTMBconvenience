@@ -40,6 +40,17 @@ safe_rbind <- function(...){
 
 ##' @export
 safe_apply <- function(x, MARGIN, FUN, ...){
+    if(is.data.frame(x)){
+        if(MARGIN == 1){
+            xl <- split(x, seq_len(nrow(x)))
+            return(lapply(xl, FUN, ...))
+        }else if(MARGIN == 2){
+            xl <- as.list(x)
+            return(lapply(xl, FUN, ...))
+        }else{
+            stop("Wrong margin for a data frame")
+        }
+    }
     indx <- slice.index(x, MARGIN)
     xl <- split(x, indx)
     lapply(xl, FUN, ...)
