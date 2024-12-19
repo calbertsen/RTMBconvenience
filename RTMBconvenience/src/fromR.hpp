@@ -1447,6 +1447,9 @@ Float pt(Float x, Float n, int lower_tail, int log_p)
     }
 #endif
 
+    if(fabs(x) < 1e-16)
+      x = 1e-16; // There seems to be some kind of cancellation in TMB if x == 0
+
     nx = 1 + (x/n)*x;
     /* FIXME: This test is probably losing rather than gaining precision,
      * now that pbeta(*, log_p = TRUE) is much better.

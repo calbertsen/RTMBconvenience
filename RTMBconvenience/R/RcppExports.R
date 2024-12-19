@@ -109,3 +109,39 @@ sparse_solve_ptr_eval_NotAD <- function(ss, y) {
     .Call(`_RTMBconvenience_sparse_solve_ptr_eval_NotAD`, ss, y)
 }
 
+distr_dkwnorm <- function(x, mu, sigma, a, b, give_log) {
+    .Call(`_RTMBconvenience_distr_dkwnorm`, x, mu, sigma, a, b, give_log)
+}
+
+distr_pkwnorm <- function(x, mu, sigma, a, b, lower_tail, give_log) {
+    .Call(`_RTMBconvenience_distr_pkwnorm`, x, mu, sigma, a, b, lower_tail, give_log)
+}
+
+spline_bcspline <- function(x, knots, pars) {
+    .Call(`_RTMBconvenience_spline_bcspline`, x, knots, pars)
+}
+
+spline_ibcspline <- function(x, knots, pars) {
+    .Call(`_RTMBconvenience_spline_ibcspline`, x, knots, pars)
+}
+
+spline_ibcdspline <- function(x, knots, pars) {
+    .Call(`_RTMBconvenience_spline_ibcdspline`, x, knots, pars)
+}
+
+spline_ibcispline <- function(x, knots, pars) {
+    .Call(`_RTMBconvenience_spline_ibcispline`, x, knots, pars)
+}
+
+spline_iibcspline <- function(x, knots, pars) {
+    .Call(`_RTMBconvenience_spline_iibcspline`, x, knots, pars)
+}
+
+spline_iibcdspline <- function(x, knots, pars) {
+    .Call(`_RTMBconvenience_spline_iibcdspline`, x, knots, pars)
+}
+
+spline_iibcispline <- function(x, knots, pars) {
+    .Call(`_RTMBconvenience_spline_iibcispline`, x, knots, pars)
+}
+

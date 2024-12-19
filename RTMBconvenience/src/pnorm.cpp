@@ -234,6 +234,8 @@ Type pnorm5_(Type x, Type mu, Type sigma, int lower_tail, int log_p){
   return res;
 }
 
+template double pnorm5_(double, double, double, int, int);
+
 // [[Rcpp::export]]
 ADrep pnorm5_ad(ADrep x, ADrep mu, ADrep sigma, bool lower_tail, bool log_p ) {
   size_t n1 = x.size();

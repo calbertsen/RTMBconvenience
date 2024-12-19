@@ -11,12 +11,12 @@ simplify <- function(x){
 }
 
 ##' @export
-Value <- function(x){
-    if(is(x,"advector"))
-        return(Im(unclass(x)))
-    x
-}
-
+## Value <- function(x){
+##     if(is(x,"advector"))
+##         return(Im(unclass(x)))
+##     x
+## }
+Value <- function(...) RTMB:::getValues(...)
 
 ##' @importFrom RTMB cbind.advector
 ##' @export
