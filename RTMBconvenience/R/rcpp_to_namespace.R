@@ -393,6 +393,7 @@ setMethod("log_MarcumQ",
 ## login_log_MarcumQ.advector <- function(loga, logb, nu){
 ##     login_log_MarcumQ_ad(loga,logb, nu)
 ## }
+##' @export
 setGeneric("login_log_MarcumQ", function(loga,logb,nu){
               (login_log_MarcumQ_ad(advector(loga),advector(logb),advector(nu)))
           })
@@ -460,6 +461,7 @@ setMethod("log_Marcum1mQ",
 ## login_log_Marcum1mQ.advector <- function(loga, logb, nu){
 ##     login_log_Marcum1mQ_ad(loga,logb, nu)
 ## }
+##' @export
 setGeneric("login_log_Marcum1mQ", function(loga,logb,nu){
               (login_log_Marcum1mQ_ad(advector(loga),advector(logb),advector(nu)))
           })
@@ -525,6 +527,7 @@ setMethod("logdrice",
 ## logprice.advector <- function(logx, lognu, logsigma, lower_tail = TRUE){
 ##     logprice_ad(logx, lognu, logsigma, lower_tail)
 ## }
+##' @export
 setGeneric("logprice", function(logx,lognu,logsigma, lower_tail = TRUE){
               (logprice_ad(advector(logx),advector(lognu),advector(logsigma), lower_tail))
           })
@@ -549,6 +552,7 @@ setMethod("logprice",
 
 
 
+##' @export
 setGeneric("pnchisq", function(x,df,ncp, lower_tail = TRUE, log_p=FALSE){
               (pnchisq_ad(advector(x),advector(df),advector(ncp), lower_tail, log_p))
           })
@@ -575,6 +579,7 @@ setMethod("pnchisq",
 
 
 
+##' @export
 setGeneric("pde_scheme", function(x){
               pde_scheme_ad(advector(x))
           })
@@ -605,3 +610,79 @@ sparse_solve <- function(x,b){
         return(sparse_solve_NotAD(as(x,"sparseMatrix"),b))
     }
 }
+
+
+
+
+##' @export
+setGeneric("logspace_1m", function(x){
+              logspace_1m_ad(advector(x))
+          })
+##' @export
+setMethod("logspace_1m",
+          signature(x = "num"),
+          function(x){
+              Value(logspace_1m_ad(advector(x)))
+          })
+##' @export
+setMethod("logspace_1m",
+          signature(x = "ad"),
+          function(x){
+              logspace_1m_ad(advector(x))
+          })
+##' @export
+setMethod("logspace_1m",
+          signature(x = "advector"),
+          function(x){
+              logspace_1m_ad(x)
+          })
+
+
+##' @export
+setGeneric("logspace_1p", function(x){
+              logspace_1p_ad(advector(x))
+          })
+##' @export
+setMethod("logspace_1p",
+          signature(x = "num"),
+          function(x){
+              Value(logspace_1p_ad(advector(x)))
+          })
+##' @export
+setMethod("logspace_1p",
+          signature(x = "ad"),
+          function(x){
+              logspace_1p_ad(advector(x))
+          })
+##' @export
+setMethod("logspace_1p",
+          signature(x = "advector"),
+          function(x){
+              logspace_1p_ad(x)
+          })
+
+
+
+
+##' @export
+setGeneric("continuationRatioLogitToLogProbability", function(x){
+              continuationRatioLogitToLogProbability_ad(advector(x))
+          })
+##' @export
+setMethod("continuationRatioLogitToLogProbability",
+          signature(x = "num"),
+          function(x){
+              Value(continuationRatioLogitToLogProbability_ad(advector(x)))
+          })
+##' @export
+setMethod("continuationRatioLogitToLogProbability",
+          signature(x = "ad"),
+          function(x){
+              continuationRatioLogitToLogProbability_ad(advector(x))
+          })
+##' @export
+setMethod("continuationRatioLogitToLogProbability",
+          signature(x = "advector"),
+          function(x){
+              continuationRatioLogitToLogProbability_ad(x)
+          })

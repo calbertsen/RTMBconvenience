@@ -82,6 +82,15 @@ namespace adaptive {
   }
 
   template<class Float>
+  Float logspace_1m_raw (Float logx) {
+    return log1p(-exp(logx));
+  }
+  template<class Float>
+  Float logspace_1p_raw (Float logx) {
+    return log1p(exp(logx));
+  }
+  
+ template<class Float>
   Float logspace_sub2_raw (Float logx, Float logy) {
     if(logx == logy)
       return R_NegInf;
@@ -92,6 +101,7 @@ namespace adaptive {
     return logx + atomic::robust_utils::R_Log1_Exp(logy - logx);
   }
 
+  
   template<class Float>
   Float quantreg_raw (Float x, Float tau) {
     if(x < 0)
@@ -432,6 +442,47 @@ ADrep logspace_sum_ad(ADrep x) {
 }
 
 
+TMB_BIND_ATOMIC(logspace_1mx,
+		1,
+		adaptive::logspace_1m_raw(x[0]))  
+template<class Type>
+Type logspace_1m(Type logx) {
+  vector<Type> tx(2);
+  tx[0] = logx;
+  tx[1] = 0; // order
+  return logspace_1mx(CppAD::vector<Type>(tx))[0];
+}
+// [[Rcpp::export]]
+ADrep logspace_1m_ad(ADrep x) {
+  int n = x.size();
+  ADrep ans(n);
+  const ad* X1 = adptr(x);
+  ad* Y = adptr(ans);
+  for (int i=0; i<n; i++) Y[i] = logspace_1m(X1[i]);
+  return ans;
+}
+
+TMB_BIND_ATOMIC(logspace_1px,
+		1,
+		adaptive::logspace_1p_raw(x[0]))  
+template<class Type>
+Type logspace_1p(Type logx) {
+  vector<Type> tx(2);
+  tx[0] = logx;
+  tx[1] = 0; // order
+  return logspace_1px(CppAD::vector<Type>(tx))[0];
+}
+// [[Rcpp::export]]
+ADrep logspace_1p_ad(ADrep x) {
+  int n = x.size();
+  ADrep ans(n);
+  const ad* X1 = adptr(x);
+  ad* Y = adptr(ans);
+  for (int i=0; i<n; i++) Y[i] = logspace_1p(X1[i]);
+  return ans;
+}
+
+
 
 TMB_BIND_ATOMIC(logspace_sub2x,
 		11,
@@ -700,5 +751,24 @@ ADrep logprice_ad(ADrep logx, ADrep lognu, ADrep logsigma, bool lower_tail) {
   const ad* X1 = adptr(logx); const ad* X2 = adptr(lognu); const ad* X3 = adptr(logsigma);
   ad* Y = adptr(ans);
   for (int i=0; i<n; i++) Y[i] = logprice_(X1[i % n1], X2[i % n2], X3[i % n3], lower_tail);
+  return ans;
+}
+
+
+
+// [[Rcpp::export]]
+ADrep continuationRatioLogitToLogProbability_ad(ADrep logitPi) {
+  size_t n = logitPi.size();
+  size_t n2 = n+1;
+  ADrep ans(n2);
+  const ad* gamma = adptr(logitPi);
+  ad* Y = adptr(ans);
+  ad tmp(0.0);
+  for(size_t i = 0; i < n; i++){
+    const ad lpi = -logspace_1p(-gamma[i]); 
+    Y[i] = lpi + tmp;
+    tmp = tmp - gamma[i] + lpi;
+  }
+  Y[n] = tmp;
   return ans;
 }
