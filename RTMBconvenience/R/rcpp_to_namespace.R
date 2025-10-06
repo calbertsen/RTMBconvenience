@@ -277,6 +277,30 @@ setMethod("quantreg_loss",
           })
 
 
+##' @export
+setGeneric("linspline1", function(x,m,a,b){
+              (linspline1_ad(advector(x),advector(m),advector(a),advector(b)))
+          })
+##' @export
+setMethod("linspline1",
+          signature(x = "num", m = "num", a = "num", b = "num"),
+          function(x, m,a,b){
+              Value(linspline1_ad(advector(x),advector(m),advector(a),advector(b)))
+          })
+##' @export
+setMethod("linspline1",
+          signature(x = "ad", m = "ad", a = "ad", b = "ad"),
+          function(x,m,a,b){
+              linspline1_ad(advector(x),advector(m),advector(a),advector(b))
+          })
+##' @export
+setMethod("linspline1",
+          signature(x = "advector",m = "advector",a = "advector",b = "advector"),
+          function(x,m,a,b){
+              linspline1_ad(advector(x),advector(m),advector(a),advector(b))
+          })
+
+
 
 ## ##' @export
 ## login_log_besselI <- function(logx, nu) UseMethod("login_log_besselI")

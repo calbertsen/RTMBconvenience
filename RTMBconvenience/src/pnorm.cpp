@@ -194,7 +194,12 @@ namespace adaptive {
     return ut;
   }
 
-
+  template<class Float>
+  Float linspline1_raw(Float x, Float a, Float b){
+    if(x < 0)
+      return(a*x);
+    return(b*x);
+  }
   
 }
 
@@ -401,6 +406,36 @@ ADrep pde_scheme_ad(ADrep x) {
   for (int i=0; i<n; i++) Y[i] = ps_(X1[i]);
   return ans;
 }
+
+
+TMB_BIND_ATOMIC(linspline10,111,adaptive::linspline1_raw(x[0],x[1],x[2]) )
+template<class Type>
+Type linspline1_(Type x, Type m, Type a, Type b) {  
+  vector<Type> tx(4);
+  tx[0] = x-m;
+  tx[1] = a;
+  tx[2] = b;
+  tx[3] = 0; // order
+  return linspline10(CppAD::vector<Type>(tx))[0];
+}
+
+// [[Rcpp::export]]
+ADrep linspline1_ad(ADrep x, ADrep m, ADrep a, ADrep b) {
+  int n1 = x.size();
+  int n2 = m.size();
+  int n3 = a.size();
+  int n4 = b.size();
+  int nmax = std::max({n1, n2, n3, n4});
+  int nmin = std::min({n1, n2, n3, n4});
+  int n = (nmin == 0 ? 0 : nmax);
+  ADrep ans(n);
+  const ad* X1 = adptr(x); const ad* X2 = adptr(m); const ad* X3 = adptr(a); const ad* X4 = adptr(b);
+  ad* Y = adptr(ans);
+  for (int i=0; i<n; i++) Y[i] = linspline1_(X1[i % n1], X2[i % n2], X3[i % n3], X4[i % n4]);
+  return ans;
+
+}
+
 
 
 TMB_BIND_ATOMIC(logspace_add2x,

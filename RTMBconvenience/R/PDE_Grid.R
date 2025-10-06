@@ -276,7 +276,7 @@ Grid1D <- function(map, cellSize, time = NA, clip = FALSE){
 }
 
 #' @export
-Grid2D <- function(map, cellSize, square = FALSE, time = NA, clip = FALSE, minArea = 0.1, centroidInCell = TRUE){
+Grid2D <- function(map, cellSize, square = FALSE, time = NA, clip = FALSE, minArea = 0.1, centroidInCell = TRUE, rm.noNeighbour = FALSE){
     if(!is(map,"sfc"))
         stop("wrong class, map must be sfc")
 
@@ -296,12 +296,13 @@ Grid2D <- function(map, cellSize, square = FALSE, time = NA, clip = FALSE, minAr
     if(length(grid)==0) stop("minArea too large. No cells left.")
     
     ## Check for neighbour (linestring intersection)
-    hasN <- sapply(seq_along(grid),function(i)max(as.numeric(st_length(st_intersection(grid[i],grid[-i])))) > 0)
-    grid <- grid[hasN]
-    if(length(grid)==0) stop("minArea too large. No cells left.")
+    if(rm.noNeighbour){
+        hasN <- sapply(seq_along(grid),function(i)max(as.numeric(st_length(st_intersection(grid[i],grid[-i])))) > 0)
+        grid <- grid[hasN]
+        if(length(grid)==0) stop("No cells left after removing cells without neighbours.")
+    }
     ## Remove neighbours with only points
     
-
     Gcentroids <- get_centroid_in(grid, centroidInCell)
 
     Gareas <- as.numeric(st_area(grid))

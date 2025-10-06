@@ -257,3 +257,68 @@ buildPDESystem <- function(mu,D,rho,S, grd, phi0, usePointer = FALSE){
 ##     }
 ##     #if(!is(grd, "Grid"
 ## }
+
+## SDE2CTMC <- function(mu,D)
+BuildSDEGenerator <- function(t0,t1, phi0){
+        dt <- t1 - t0
+        rho_P <- simplify(lapply(seq_len(numCells), function(i) rho(X = grd@Gcentroids[,i], Time = t, Cell = i)))
+        Sstar <- simplify(lapply(seq_len(numCells), function(i)  S_atomic(c(phi0[i],t0,i)) ))
+        dS <- simplify(lapply(seq_len(numCells), function(i) S_atomic$jacobian(c(phi0[i],t0,i))[1,1]))
+        S0 <- Sstar - dS * phi0
+        S1 <- dS
+        S0 <- AD(rep(0, numCells))
+        S1 <- AD(rep(0,numCells))
+        innerProd <- function(x, y) (x %*% y)[1,1]
+        norm <- function(x) sqrt(innerProd(x,x))
+        makeOneCell <- function(i){                    
+            ga <- grd@Gareas[i]                
+            T1 <- rho_P[i] - S1[i] * dt ## Diagonal
+            makeOneNeighbour <- function(j){
+                nj <- grd@neighbours[[i]][j]
+                snv <- grd@Snvec[[i]][,j]
+                ## Advection
+                muval <- mu(grd@Scentroids[[i]][,j], t0)
+                mf <- innerProd(muval,snv) * grd@Sarea[[i]][j]
+                ## Diffusion
+                Dval <- D(grd@Scentroids[[i]][,j], t0)
+                dcf <- grd@Gcentroids[,nj] - grd@Gcentroids[,i]
+                Sf <- Dval %*% snv
+                SfNorm <- norm(Sf)
+                dcfNorm <- norm(dcf)
+                ## Convection
+                Ff <- mf
+                Df <- SfNorm / dcfNorm
+                Pf <- mf / SfNorm * dcfNorm
+                af <- pde_scheme(Pf)
+                aA <- Df - (1 - af) * Ff
+                ## rbind(c(i,nj,-aA * dt / ga),
+                ##       c(i,i,(aA + Ff) * dt / ga))
+                c(-aA * dt / ga, (aA + Ff) * dt / ga)
+            }
+            do.call("c",c(list(T1),lapply(seq_along(grd@neighbours[[i]]), makeOneNeighbour)))
+        }
+        X <- do.call("c",lapply(seq_along(grd@neighbours), makeOneCell))
+        I <- rep(seq_along(grd@Sarea), times = 2 * sapply(grd@Sarea,length) + 1)
+        J <- do.call("c",lapply(seq_along(grd@Sarea), function(i) c(i,sapply(grd@neighbours[[i]],function(j) c(j,i)))))
+        X2 <- safe_aggregate(X,list(I=I,J=J), sum)    
+        p <- c(0,cumsum(sapply(split(X2$J,cumsum(c(0,diff(X2$J)))),length)))
+        dp <- diff(p)
+        pp <- rep(seq_along(dp),dp)
+        if(RTMB:::ad_context()){
+            A <- new("adsparse",
+                     x = X2$x,
+                     i = as.integer(X2$I)-1L,
+                     p = as.integer(p),
+                     Dim = c(length(grd@Sarea),length(grd@Sarea)))
+        }else{
+            A <- new("dgCMatrix",
+                     x=X2$x,
+                     i=as.integer(X2$I)-1L,
+                     p=as.integer(p),
+                     Dim = c(length(grd@Sarea),length(grd@Sarea))
+                     )
+        }
+        b <- S0 * dt + rho_P * phi0
+        return(list(A=A,b=b))
+    }
+   

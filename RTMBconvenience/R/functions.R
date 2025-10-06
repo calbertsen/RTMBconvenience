@@ -16,7 +16,11 @@ simplify <- function(x){
 ##         return(Im(unclass(x)))
 ##     x
 ## }
-Value <- function(...) RTMB:::getValues(...)
+Value <- function(x){
+    if(is(x,"advector"))
+        return(RTMB:::getValues(x))
+    x
+}
 
 ##' @importFrom RTMB cbind.advector
 ##' @export
@@ -97,4 +101,10 @@ toRowLogPropMatrix <- function(x){
 ##' @export
 logspace_1m <- function(logx){
     log1p(-exp(logx))
+}
+
+##' @export
+undim <- function(x){
+    dim(x) <- NULL
+    x
 }
